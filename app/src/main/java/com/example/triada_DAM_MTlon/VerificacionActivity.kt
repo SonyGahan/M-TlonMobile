@@ -41,5 +41,10 @@ class VerificacionActivity : AppCompatActivity() {
                 Toast.makeText(this, "Por favor, ingrese un DNI", Toast.LENGTH_SHORT).show()
             }
         }
+
+        val btnVolverMenu = findViewById<Button>(R.id.btnVolverMenuVerificacion)
+        btnVolverMenu.setOnClickListener {
+            finish()
+        }
     }
 }

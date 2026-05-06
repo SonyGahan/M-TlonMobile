@@ -51,4 +51,20 @@
         android:layout_marginHorizontal="32dp"
         tools:ignore="HardcodedText,VisualLintButtonSize" />
 
+    <Button
+        android:id="@+id/btnVolverMenuVerificacion"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:text="Atrás"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:backgroundTint="#2A2A35"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@+id/btnVerificar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

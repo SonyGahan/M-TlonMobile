@@ -26,10 +26,7 @@ class ComprobanteActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvMetodoTicket).text = "Método: $metodo"
 
         findViewById<Button>(R.id.btnImprimirTicket).setOnClickListener {
-            android.app.AlertDialog.Builder(this)
-                .setMessage("Comprobante impreso")
-                .setPositiveButton("OK", null)
-                .show()
+            android.widget.Toast.makeText(this, "Imprimiendo comprobante...", android.widget.Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnFinalizarTicket).setOnClickListener {

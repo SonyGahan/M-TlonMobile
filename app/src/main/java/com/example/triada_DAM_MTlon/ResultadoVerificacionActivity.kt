@@ -30,6 +30,7 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         val llRegistrado = findViewById<LinearLayout>(R.id.llRegistrado)
         val llTarjetaCuota = findViewById<LinearLayout>(R.id.llTarjetaCuota)
         val btnNuevaConsulta = findViewById<Button>(R.id.btnNuevaConsulta)
+        val btnAtrasResult = findViewById<Button>(R.id.btnAtrasResult)
         val btnVolverMenuResult = findViewById<Button>(R.id.btnVolverMenuResult)
         val btnImprimirCarnet = findViewById<Button>(R.id.btnImprimirCarnet)
         val cursor = db.consultarEstadoDNI(dniRecibido)
@@ -122,6 +123,10 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         btnNuevaConsulta.setOnClickListener {
             val intentConsulta = Intent(this, VerificacionActivity::class.java)
             startActivity(intentConsulta)
+            finish()
+        }
+
+        btnAtrasResult.setOnClickListener {
             finish()
         }
 

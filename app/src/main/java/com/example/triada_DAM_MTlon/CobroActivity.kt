@@ -32,6 +32,7 @@ class CobroActivity : AppCompatActivity() {
         spModoPago.adapter = adapter
 
         val btnRegistrarPago = findViewById<Button>(R.id.btnRegistrarPago)
+        val btnNuevaConsulta = findViewById<Button>(R.id.btnNuevaConsultaCobro)
         val btnVolverMenu = findViewById<Button>(R.id.btnVolverMenu)
 
         val db = Datos(this)
@@ -79,6 +80,13 @@ class CobroActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Complete todos los campos del pago", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        btnNuevaConsulta.setOnClickListener {
+            val intentConsulta = Intent(this, VerificacionActivity::class.java)
+            intentConsulta.putExtra("FLUJO", "PAGOS")
+            startActivity(intentConsulta)
+            finish()
         }
 
         btnVolverMenu.setOnClickListener {

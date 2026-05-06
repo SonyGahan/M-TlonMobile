@@ -130,6 +130,16 @@
         tools:ignore="HardcodedText,VisualLintButtonSize" />
 
     <Button
+        android:id="@+id/btnAtrasResult"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Atrás"
+        android:backgroundTint="#2A2A35"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+    <Button
         android:id="@+id/btnVolverMenuResult"
         android:layout_width="match_parent"
         android:layout_height="60dp"

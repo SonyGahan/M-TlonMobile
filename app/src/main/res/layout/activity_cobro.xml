@@ -121,6 +121,16 @@
         tools:ignore="HardcodedText,VisualLintButtonSize" />
 
     <Button
+        android:id="@+id/btnNuevaConsultaCobro"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Nueva Consulta"
+        android:backgroundTint="#2A2A35"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+    <Button
         android:id="@+id/btnVolverMenu"
         android:layout_width="match_parent"
         android:layout_height="60dp"

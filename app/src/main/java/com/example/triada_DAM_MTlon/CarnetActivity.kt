@@ -24,6 +24,8 @@ class CarnetActivity : AppCompatActivity() {
         val tvEmail = findViewById<TextView>(R.id.tvEmailCarnet)
         val tvVencimientoApto = findViewById<TextView>(R.id.tvVencimientoCarnet)
         val btnVolver = findViewById<Button>(R.id.btnVolverDeCarnet)
+        val btnImprimir = findViewById<Button>(R.id.btnImprimirCarnet)
+        val btnInicio = findViewById<Button>(R.id.btnInicioDeCarnet)
 
         if (dniRecibido.isNotEmpty()) {
             val cursor = db.consultarEstadoDNI(dniRecibido)
@@ -56,6 +58,17 @@ class CarnetActivity : AppCompatActivity() {
                 tvVencimientoApto.text = textoVencimiento
             }
             cursor.close()
+        }
+
+        btnImprimir.setOnClickListener {
+            android.widget.Toast.makeText(this, "Imprimiendo carnet...", android.widget.Toast.LENGTH_SHORT).show()
+        }
+
+        btnInicio.setOnClickListener {
+            val intentMenu = android.content.Intent(this, MenuActivity::class.java)
+            intentMenu.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intentMenu)
+            finish()
         }
 
         btnVolver.setOnClickListener {
