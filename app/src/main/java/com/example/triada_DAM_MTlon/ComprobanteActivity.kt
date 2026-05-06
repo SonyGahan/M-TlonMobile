@@ -1,0 +1,33 @@
+package com.example.triada_DAM_MTlon
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class ComprobanteActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_comprobante)
+
+        // Recuperamos los datos del Intent
+        val monto = intent.getStringExtra("MONTO") ?: "0"
+        val dni = intent.getStringExtra("DNI") ?: ""
+        val fecha = intent.getStringExtra("FECHA") ?: ""
+        val metodo = intent.getStringExtra("METODO") ?: ""
+
+        // Referenciamos y asignamos
+        findViewById<TextView>(R.id.tvMontoTicket).text = "$$monto"
+        findViewById<TextView>(R.id.tvIdClienteTicket).text = "ID Cliente: $dni"
+        findViewById<TextView>(R.id.tvFechaTicket).text = "Fecha: $fecha"
+        findViewById<TextView>(R.id.tvMetodoTicket).text = "Método: $metodo"
+
+        findViewById<Button>(R.id.btnFinalizarTicket).setOnClickListener {
+            // Limpiamos el historial y volvemos al menú principal
+            val intentMenu = Intent(this, MenuActivity::class.java)
+            intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intentMenu)
+        }
+    }
+}
