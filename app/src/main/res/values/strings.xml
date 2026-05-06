@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">triada_DAM_MTlon</string>
+    <string name="m_tlon">M-TLON</string>
+    <string name="nombre_apellido">Nombre Apellido</string>
+    <string name="carnet_socio">CARNET SOCIO</string>
+    <string name="dni">DNI:</string>
+    <string name="email">Email:</string>
+    <string name="vence">Vence: --/--/----</string>
+    <string name="volver_al_inicio">Volver al Inicio</string>
+    <string name="nombre_y_apellido">Nombre y Apellido</string>
 </resources>

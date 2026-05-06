@@ -10,13 +10,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="M-TLON"
+        android:text="@string/m_tlon"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp"/>
 
-    <!-- Tarjeta de Socio -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CARNET SOCIO"
+            android:text="@string/carnet_socio"
             android:textColor="#00E5FF"
             android:textSize="14sp"
             android:layout_marginBottom="16dp"/>
@@ -37,7 +36,7 @@
             android:id="@+id/tvNombreCarnet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nombre Apellido"
+            android:text="@string/nombre_apellido"
             android:textColor="#FFFFFF"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -47,7 +46,7 @@
             android:id="@+id/tvDniCarnet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="DNI: "
+            android:text="@string/dni"
             android:textColor="#E0E0E0"
             android:layout_marginBottom="4dp"/>
 
@@ -55,7 +54,7 @@
             android:id="@+id/tvEmailCarnet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Email: "
+            android:text="@string/email"
             android:textColor="#E0E0E0"
             android:layout_marginBottom="16dp"/>
 
@@ -69,7 +68,7 @@
             android:id="@+id/tvVencimientoCarnet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vence: --/--/----"
+            android:text="@string/vence"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"/>
@@ -79,7 +78,7 @@
         android:id="@+id/btnVolverDeCarnet"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="Volver al Inicio"
+        android:text="@string/volver_al_inicio"
         android:backgroundTint="#424242"
         android:textColor="#FFFFFF"
         android:layout_marginTop="32dp"/>

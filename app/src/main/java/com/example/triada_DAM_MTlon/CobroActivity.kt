@@ -1,5 +1,6 @@
 package com.example.triada_DAM_MTlon
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -10,6 +11,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class CobroActivity : AppCompatActivity() {
+    @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +27,7 @@ class CobroActivity : AppCompatActivity() {
 
         val spModoPago = findViewById<Spinner>(R.id.spModoPago)
         val opciones = arrayOf("Efectivo", "Transferencia")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, opciones)
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, opciones)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spModoPago.adapter = adapter
 
@@ -69,7 +71,7 @@ class CobroActivity : AppCompatActivity() {
                     startActivity(intentTicket)
                     finish()
                 }
-                // -------------------------------------------------------
+
             } else {
                 Toast.makeText(this, "Complete todos los campos del pago", Toast.LENGTH_SHORT).show()
             }

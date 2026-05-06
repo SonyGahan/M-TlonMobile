@@ -1,5 +1,6 @@
 package com.example.triada_DAM_MTlon
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class ResultadoVerificacionActivity : AppCompatActivity() {
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_resultado_verificacion)
@@ -19,16 +21,12 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         val llNoRegistrado = findViewById<LinearLayout>(R.id.llNoRegistrado)
         val llRegistrado = findViewById<LinearLayout>(R.id.llRegistrado)
         val llTarjetaCuota = findViewById<LinearLayout>(R.id.llTarjetaCuota)
-
-        // Referenciamos los botones principales
         val btnNuevaConsulta = findViewById<Button>(R.id.btnNuevaConsulta)
         val btnVolverMenuResult = findViewById<Button>(R.id.btnVolverMenuResult)
         val btnImprimirCarnet = findViewById<Button>(R.id.btnImprimirCarnet)
-
         val cursor = db.consultarEstadoDNI(dniRecibido)
 
         if (cursor.moveToFirst()) {
-            // CASO: DNI ENCONTRADO
             llRegistrado.visibility = View.VISIBLE
             llNoRegistrado.visibility = View.GONE
 
@@ -42,29 +40,25 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.tvTipoSocioBadge).text = tipoUsuario
             findViewById<TextView>(R.id.tvAptoResult).text = "Apto Físico: $estadoApto"
 
-            // Lógica de visibilidad exclusiva para SOCIOS[cite: 5]
             if (tipoUsuario.equals("Socio", ignoreCase = true)) {
                 llTarjetaCuota.visibility = View.VISIBLE
                 btnImprimirCarnet.visibility = View.VISIBLE
                 findViewById<TextView>(R.id.tvEstadoCuota).text = "Estado de Cuota: $estadoCuota"
 
-                // Solo asignamos el click si es socio para evitar errores
                 btnImprimirCarnet.setOnClickListener {
                     val intentCarnet = Intent(this, CarnetActivity::class.java)
                     intentCarnet.putExtra("DNI", dniRecibido)
                     startActivity(intentCarnet)
                 }
             } else {
-                // Si es "No Socio", ocultamos los elementos de socio[cite: 5]
                 llTarjetaCuota.visibility = View.GONE
                 btnImprimirCarnet.visibility = View.GONE
             }
 
         } else {
-            // CASO: DNI NO ENCONTRADO (FLUJO DE REGISTRO NUEVO)[cite: 5]
             llNoRegistrado.visibility = View.VISIBLE
             llRegistrado.visibility = View.GONE
-            btnImprimirCarnet.visibility = View.GONE // Blindaje: ocultar por las dudas
+            btnImprimirCarnet.visibility = View.GONE
 
             findViewById<TextView>(R.id.tvDniBuscado).text = "DNI: $dniRecibido"
 
@@ -77,7 +71,6 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         }
         cursor.close()
 
-        // Listeners de navegación general[cite: 5]
         btnNuevaConsulta.setOnClickListener {
             val intentConsulta = Intent(this, VerificacionActivity::class.java)
             startActivity(intentConsulta)

@@ -1,4 +1,4 @@
-package com.example.triada_DAM_MTlon // Asegúrate de mantener tu paquete
+package com.example.triada_DAM_MTlon
 
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +27,6 @@ class MenuActivity : AppCompatActivity() {
 
         btnPagos.setOnClickListener {
             val intent = Intent(this, VerificacionActivity::class.java)
-            // Enviamos una señal para saber que venimos desde el botón Pagos
             intent.putExtra("FLUJO", "PAGOS")
             startActivity(intent)
         }

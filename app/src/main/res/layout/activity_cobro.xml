@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -18,7 +19,7 @@
             android:id="@+id/tvNombreCompleto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre y Apellido"
+            android:text="@string/nombre_y_apellido"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:layout_marginBottom="16dp"/>
@@ -29,7 +30,8 @@
             android:layout_height="wrap_content"
             android:text="DNI: "
             android:textColor="#E0E0E0"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/tvEmailCobro"
@@ -37,14 +39,16 @@
             android:layout_height="wrap_content"
             android:text="Email: "
             android:textColor="#E0E0E0"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/tvTelefonoCobro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Teléfono: "
-            android:textColor="#E0E0E0"/>
+            android:textColor="#E0E0E0"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -60,23 +64,28 @@
             android:layout_height="wrap_content"
             android:text="Monto cuota"
             android:textColor="#E0E0E0"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="4dp"
+            tools:ignore="HardcodedText" />
+
         <EditText
             android:id="@+id/etMonto"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints=""
             android:background="#1A1A24"
-            android:textColor="#FFFFFF"
-            android:padding="12dp"
             android:inputType="number"
-            android:layout_marginBottom="16dp"/>
+            android:padding="12dp"
+            android:textColor="#FFFFFF"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Modo de pago"
             android:textColor="#E0E0E0"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="4dp"
+            tools:ignore="HardcodedText" />
         <Spinner
             android:id="@+id/spModoPago"
             android:layout_width="match_parent"
@@ -92,7 +101,8 @@
         android:text="Registrar pago"
         android:backgroundTint="#00E5FF"
         android:textColor="#000000"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
 
     <Button
         android:id="@+id/btnVolverMenu"
@@ -100,6 +110,7 @@
         android:layout_height="60dp"
         android:text="Volver al Inicio"
         android:backgroundTint="#424242"
-        android:textColor="#FFFFFF"/>
+        android:textColor="#FFFFFF"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
 
 </LinearLayout>

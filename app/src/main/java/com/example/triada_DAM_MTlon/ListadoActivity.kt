@@ -6,34 +6,47 @@ import android.widget.Button
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 
 class ListadoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_listado)
 
-        val gridLayoutResultado = findViewById<GridLayout>(R.id.gridLayout)
         val btnVolver = findViewById<Button>(R.id.btnVolverListado)
+        val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
+
         val base = Datos(this)
         val resultadosConsulta: List<List<String>> = base.obtenerVencimientosComoLista()
+        val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
+
+        for (titulo in encabezados) {
+            val tvHeader = TextView(this)
+            tvHeader.text = titulo
+            tvHeader.setTextColor("#00E5FF".toColorInt())
+            tvHeader.setPadding(12, 16, 12, 16)
+            tvHeader.setTypeface(null, android.graphics.Typeface.BOLD)
+            gridLayout.addView(tvHeader)
+        }
 
         for (fila in resultadosConsulta) {
             for (dato in fila) {
                 val textView = TextView(this)
                 textView.text = dato
                 textView.setTextColor(getColor(android.R.color.white))
-                textView.setPadding(8, 8, 8, 8)
+                textView.setPadding(12, 12, 12, 12)
 
                 val params = GridLayout.LayoutParams()
                 params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 textView.layoutParams = params
 
-                gridLayoutResultado.addView(textView)
+                gridLayout.addView(textView)
             }
         }
 
         btnVolver.setOnClickListener {
             val intentInicio = Intent(this, MenuActivity::class.java)
+            intentInicio.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intentInicio)
         }
     }

@@ -1,11 +1,17 @@
 package com.example.triada_DAM_MTlon
 
+import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import java.time.LocalDate
 
 class CarnetActivity : AppCompatActivity() {
+    @SuppressLint("SetTextI18n")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_carnet)
@@ -16,7 +22,7 @@ class CarnetActivity : AppCompatActivity() {
         val tvNombre = findViewById<TextView>(R.id.tvNombreCarnet)
         val tvDni = findViewById<TextView>(R.id.tvDniCarnet)
         val tvEmail = findViewById<TextView>(R.id.tvEmailCarnet)
-        val tvVencimiento = findViewById<TextView>(R.id.tvVencimientoCarnet)
+        val tvVencimientoApto = findViewById<TextView>(R.id.tvVencimientoCarnet)
         val btnVolver = findViewById<Button>(R.id.btnVolverDeCarnet)
 
         if (dniRecibido.isNotEmpty()) {
@@ -25,12 +31,17 @@ class CarnetActivity : AppCompatActivity() {
                 val nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"))
                 val apellido = cursor.getString(cursor.getColumnIndexOrThrow("apellido"))
                 val email = cursor.getString(cursor.getColumnIndexOrThrow("email"))
-                val vencimiento = cursor.getString(cursor.getColumnIndexOrThrow("vencimiento"))
+
+                val fechaCargaAptoStr = cursor.getString(cursor.getColumnIndexOrThrow("estado_apto"))
+
+                val fechaCarga = LocalDate.parse(fechaCargaAptoStr)
+                val vencimientoApto = fechaCarga.plusYears(1)
 
                 tvNombre.text = "$nombre $apellido"
                 tvDni.text = "DNI: $dniRecibido"
                 tvEmail.text = "Email: $email"
-                tvVencimiento.text = "Vencimiento: $vencimiento"
+
+                tvVencimientoApto.text = "Apto Médico Vence: $vencimientoApto"
             }
             cursor.close()
         }
