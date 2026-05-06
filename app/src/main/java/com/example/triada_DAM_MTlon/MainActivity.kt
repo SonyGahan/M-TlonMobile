@@ -3,6 +3,8 @@ package com.example.triada_DAM_MTlon
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -11,10 +13,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val btnIngresar = findViewById<Button>(R.id.btnIngresar)
+        val etUsuario = findViewById<EditText>(R.id.etUsuario)
+        val etContrasenia = findViewById<EditText>(R.id.etContrasena)
 
         btnIngresar.setOnClickListener {
-            val intentar = Intent(this, MenuActivity::class.java)
-            startActivity(intentar)
+            val usuario = etUsuario.text.toString()
+            val contrasenia = etContrasenia.text.toString()
+
+            if (usuario == "admin" && contrasenia == "1234") {
+                val intent = Intent(this, MenuActivity::class.java)
+                startActivity(intent)
+                finish()
+            } else {
+                Toast.makeText(this, "Usuario/contraseña incorrectos, intente nuevamente", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
