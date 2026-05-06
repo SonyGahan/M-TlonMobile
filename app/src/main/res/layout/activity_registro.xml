@@ -120,7 +120,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"
             android:background="#2A2A35"
-            android:hint="DD/MM/AAAA"
+            android:hint="YYYY-MM-DD"
             android:inputType="date"
             android:padding="12dp"
             android:textColor="#FFFFFF"
@@ -140,29 +140,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="24dp">
-
-            <TextView
-                android:id="@+id/lblMontoCuota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Monto de Cuota (Solo Socios)"
-                android:textColor="#E0E0E0"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                tools:ignore="HardcodedText" />
-
-            <EditText
-                android:id="@+id/etMontoCuota"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="16dp"
-                android:background="#2A2A35"
-                android:hint="$ 0.00"
-                android:inputType="number"
-                android:padding="16dp"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#808080"
-                tools:ignore="Autofill,HardcodedText,TextContrastCheck,VisualLintTextFieldSize" />
 
             <RadioButton
                 android:id="@+id/rbSocio"

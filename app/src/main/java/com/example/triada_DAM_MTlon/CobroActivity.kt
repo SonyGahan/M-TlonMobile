@@ -53,13 +53,15 @@ class CobroActivity : AppCompatActivity() {
         }
 
         btnRegistrarPago.setOnClickListener {
-            val montoTxt = etMonto.text.toString()
+            val montoTxt = etMonto.text.toString().trim()
             val modoPago = spModoPago.selectedItem.toString()
+            val montoNum = montoTxt.toIntOrNull()
+            val dniNum = dniRecibido.toIntOrNull()
 
-            if (montoTxt.isNotEmpty() && dniRecibido.isNotEmpty()) {
+            if (montoNum != null && dniNum != null) {
                 val fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss"))
 
-                val mensaje = db.insertarPago(dniRecibido.toInt(), montoTxt.toInt(), modoPago, fechaHoraActual)
+                val mensaje = db.insertarPago(dniNum, montoNum, modoPago, fechaHoraActual)
                 Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
 
                 if (mensaje == "¡Pago exitoso!") {

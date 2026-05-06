@@ -22,7 +22,6 @@ class RegistroActivity : AppCompatActivity() {
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etTelefono = findViewById<EditText>(R.id.etTelefono)
         val etApto = findViewById<EditText>(R.id.etApto)
-        val etMontoCuota = findViewById<EditText>(R.id.etMontoCuota)
         val rbSocio = findViewById<RadioButton>(R.id.rbSocio)
         val rbNoSocio = findViewById<RadioButton>(R.id.rbNoSocio)
         val btnRegistrarSocio = findViewById<Button>(R.id.btnRegistrarSocio)
@@ -30,20 +29,19 @@ class RegistroActivity : AppCompatActivity() {
 
         etDniReg.setText(dniRecibido)
 
-        rbNoSocio.setOnClickListener {
-            etMontoCuota.visibility = View.GONE
-            findViewById<TextView>(R.id.lblMontoCuota).visibility = View.GONE
-        }
-        rbSocio.setOnClickListener {
-            etMontoCuota.visibility = View.VISIBLE
-            findViewById<TextView>(R.id.lblMontoCuota).visibility = View.VISIBLE
-        }
+        etDniReg.setText(dniRecibido)
 
         btnRegistrarSocio.setOnClickListener {
+            val dniTxt = etDniReg.text.toString().trim()
+            val nombreTxt = etNombre.text.toString().trim()
+            val apellidoTxt = etApellido.text.toString().trim()
+            val emailTxt = etEmail.text.toString().trim()
+            val telefonoTxt = etTelefono.text.toString().trim()
             val aptoTexto = etApto.text.toString().trim()
 
-            if (aptoTexto.isEmpty()) {
-                Toast.makeText(this, "ERROR: El Apto Físico es obligatorio para el registro", Toast.LENGTH_LONG).show()
+            if (dniTxt.isEmpty() || nombreTxt.isEmpty() || apellidoTxt.isEmpty() ||
+                emailTxt.isEmpty() || telefonoTxt.isEmpty() || aptoTexto.isEmpty()) {
+                Toast.makeText(this, "ERROR: Todos los campos son obligatorios", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
@@ -52,11 +50,11 @@ class RegistroActivity : AppCompatActivity() {
             val vencimientoCuota = fechaHoy.plusMonths(1).toString()
             val db = Datos(this)
             val mensaje = db.insertarSocio(
-                etDniReg.text.toString().toInt(),
-                etNombre.text.toString(),
-                etApellido.text.toString(),
-                etEmail.text.toString(),
-                etTelefono.text.toString(),
+                dniTxt.toInt(),
+                nombreTxt,
+                apellidoTxt,
+                emailTxt,
+                telefonoTxt,
                 aptoTexto,
                 categoria,
                 vencimientoCuota
