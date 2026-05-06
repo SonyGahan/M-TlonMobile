@@ -60,6 +60,8 @@ class CobroActivity : AppCompatActivity() {
 
             if (montoNum != null && dniNum != null) {
                 val fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss"))
+                val nuevoVencimiento = LocalDateTime.now().plusMonths(1).toLocalDate().toString()
+                db.actualizarVencimiento(dniNum, nuevoVencimiento)
 
                 val mensaje = db.insertarPago(dniNum, montoNum, modoPago, fechaHoraActual)
                 Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()

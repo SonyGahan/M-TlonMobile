@@ -2,13 +2,17 @@ package com.example.triada_DAM_MTlon
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Build
 import android.widget.Button
 import android.widget.GridLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
+import java.time.LocalDate
 
 class ListadoActivity : AppCompatActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_listado)
@@ -17,7 +21,8 @@ class ListadoActivity : AppCompatActivity() {
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
 
         val base = Datos(this)
-        val resultadosConsulta: List<List<String>> = base.obtenerVencimientosComoLista()
+        val fechaHoy = LocalDate.now().toString()
+        val resultadosConsulta: List<List<String>> = base.obtenerVencimientosComoLista(fechaHoy)
         val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
 
         for (titulo in encabezados) {

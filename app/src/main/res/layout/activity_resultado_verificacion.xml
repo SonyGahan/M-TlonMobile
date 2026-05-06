@@ -81,7 +81,17 @@
             android:background="#1A1A24"
             android:padding="16dp"
             android:textColor="#FFFFFF"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btnRenovarApto"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Renovar Apto Médico"
+            android:backgroundTint="#2A2A35"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"
+            tools:ignore="HardcodedText" />
 
         <LinearLayout
             android:id="@+id/llTarjetaCuota"

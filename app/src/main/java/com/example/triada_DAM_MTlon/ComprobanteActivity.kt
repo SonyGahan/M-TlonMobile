@@ -25,6 +25,13 @@ class ComprobanteActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvFechaTicket).text = "Fecha: $fecha"
         findViewById<TextView>(R.id.tvMetodoTicket).text = "Método: $metodo"
 
+        findViewById<Button>(R.id.btnImprimirTicket).setOnClickListener {
+            android.app.AlertDialog.Builder(this)
+                .setMessage("Comprobante impreso")
+                .setPositiveButton("OK", null)
+                .show()
+        }
+
         findViewById<Button>(R.id.btnFinalizarTicket).setOnClickListener {
             val intentMenu = Intent(this, MenuActivity::class.java)
             intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

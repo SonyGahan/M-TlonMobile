@@ -72,19 +72,40 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
         return if (resultado == -1L) "Falla al registrar el pago" else "¡Pago exitoso!"
     }
 
-    fun obtenerVencimientosComoLista(): List<List<String>> {
+    fun actualizarApto(dni: String, nuevaFecha: String): Boolean {
+        val db = this.writableDatabase
+        val contenedor = ContentValues()
+        contenedor.put("estado_apto", nuevaFecha)
+        val resultado = db.update("socio", contenedor, "dni = ?", arrayOf(dni))
+        return resultado > 0
+    }
+
+    fun actualizarVencimiento(dni: Int, nuevaFecha: String) {
+        val db = this.writableDatabase
+        val contenedor = ContentValues()
+        contenedor.put("vencimiento", nuevaFecha)
+        contenedor.put("estado_cuota", "Al día")
+        db.update("socio", contenedor, "dni = ?", arrayOf(dni.toString()))
+    }
+
+    fun obtenerVencimientosComoLista(fechaHoy: String): List<List<String>> {
         val datos: MutableList<List<String>> = mutableListOf()
         val db = this.readableDatabase
         // Incluimos order by para jerarquizar la información[cite: 5]
-        val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio ORDER BY vencimiento"
-        val cursor = db.rawQuery(sql, null)
+        val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio WHERE vencimiento <= ? ORDER BY vencimiento"
+        val cursor = db.rawQuery(sql, arrayOf(fechaHoy))
 
         while (cursor.moveToNext()) {
             val fila: MutableList<String> = mutableListOf()
             fila.add(cursor.getString(cursor.getColumnIndexOrThrow("dni")))
             fila.add(cursor.getString(cursor.getColumnIndexOrThrow("apellido")))
             fila.add(cursor.getString(cursor.getColumnIndexOrThrow("nombre")))
-            fila.add(cursor.getString(cursor.getColumnIndexOrThrow("vencimiento")))
+            
+            val vencISO = cursor.getString(cursor.getColumnIndexOrThrow("vencimiento"))
+            val partes = vencISO.split("-")
+            val vencFormat = if(partes.size == 3) "${partes[2]}-${partes[1]}-${partes[0]}" else vencISO
+            fila.add(vencFormat)
+            
             datos.add(fila)
         }
         cursor.close()

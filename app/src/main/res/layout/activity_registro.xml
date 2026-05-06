@@ -120,7 +120,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"
             android:background="#2A2A35"
-            android:hint="YYYY-MM-DD"
+            android:hint="DD-MM-AAAA"
             android:inputType="date"
             android:padding="12dp"
             android:textColor="#FFFFFF"

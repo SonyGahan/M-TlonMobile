@@ -1,16 +1,24 @@
 package com.example.triada_DAM_MTlon
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class ResultadoVerificacionActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_resultado_verificacion)
@@ -35,15 +43,55 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             val tipoUsuario = cursor.getString(cursor.getColumnIndexOrThrow("tipo_usuario"))
             val estadoApto = cursor.getString(cursor.getColumnIndexOrThrow("estado_apto"))
             val estadoCuota = cursor.getString(cursor.getColumnIndexOrThrow("estado_cuota"))
+            val vencimiento = cursor.getString(cursor.getColumnIndexOrThrow("vencimiento"))
 
             findViewById<TextView>(R.id.tvNombreResult).text = "$nombre $apellido"
             findViewById<TextView>(R.id.tvTipoSocioBadge).text = tipoUsuario
-            findViewById<TextView>(R.id.tvAptoResult).text = "Apto Físico: $estadoApto"
+
+            var textoApto = "Apto Físico: $estadoApto"
+            try {
+                val partesApto = estadoApto.split("-", "/")
+                if (partesApto.size == 3) {
+                    val anio = if (partesApto[2].length == 4) partesApto[2].toInt() else partesApto[0].toInt()
+                    val mes = partesApto[1].toInt()
+                    val dia = if (partesApto[2].length == 4) partesApto[0].toInt() else partesApto[2].toInt()
+                    val fechaCarga = LocalDate.of(anio, mes, dia)
+                    val vencimientoApto = fechaCarga.plusYears(1)
+                    val vigente = if (LocalDate.now().isBefore(vencimientoApto) || LocalDate.now().isEqual(vencimientoApto)) "Vigente" else "Vencido"
+                    val formatterOut = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    textoApto = "Apto Médico: $vigente, Vencimiento: ${vencimientoApto.format(formatterOut)}"
+                }
+            } catch (e: Exception) { }
+            findViewById<TextView>(R.id.tvAptoResult).text = textoApto
+
+            val btnRenovarApto = findViewById<Button>(R.id.btnRenovarApto)
+            btnRenovarApto.setOnClickListener {
+                val input = EditText(this)
+                input.inputType = InputType.TYPE_CLASS_DATETIME
+                input.hint = "DD-MM-AAAA"
+                AlertDialog.Builder(this)
+                    .setTitle("Renovar Apto Médico")
+                    .setMessage("Ingrese la nueva fecha de carga (DD-MM-AAAA):")
+                    .setView(input)
+                    .setPositiveButton("Guardar") { _, _ ->
+                        val nuevaFecha = input.text.toString().trim()
+                        if (nuevaFecha.isNotEmpty()) {
+                            db.actualizarApto(dniRecibido, nuevaFecha)
+                            finish()
+                            startActivity(intent)
+                        }
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            }
 
             if (tipoUsuario.equals("Socio", ignoreCase = true)) {
                 llTarjetaCuota.visibility = View.VISIBLE
                 btnImprimirCarnet.visibility = View.VISIBLE
-                findViewById<TextView>(R.id.tvEstadoCuota).text = "Estado de Cuota: $estadoCuota"
+                
+                val partesVenc = vencimiento.split("-")
+                val vencFormat = if(partesVenc.size == 3) "${partesVenc[2]}-${partesVenc[1]}-${partesVenc[0]}" else vencimiento
+                findViewById<TextView>(R.id.tvEstadoCuota).text = "Estado de Cuota: $estadoCuota, Vence: $vencFormat"
 
                 btnImprimirCarnet.setOnClickListener {
                     val intentCarnet = Intent(this, CarnetActivity::class.java)

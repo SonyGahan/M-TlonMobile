@@ -34,14 +34,26 @@ class CarnetActivity : AppCompatActivity() {
 
                 val fechaCargaAptoStr = cursor.getString(cursor.getColumnIndexOrThrow("estado_apto"))
 
-                val fechaCarga = LocalDate.parse(fechaCargaAptoStr)
-                val vencimientoApto = fechaCarga.plusYears(1)
+                var textoVencimiento = "Apto Médico: $fechaCargaAptoStr"
+                try {
+                    val partesApto = fechaCargaAptoStr.split("-", "/")
+                    if (partesApto.size == 3) {
+                        val anio = if (partesApto[2].length == 4) partesApto[2].toInt() else partesApto[0].toInt()
+                        val mes = partesApto[1].toInt()
+                        val dia = if (partesApto[2].length == 4) partesApto[0].toInt() else partesApto[2].toInt()
+                        val fechaCarga = LocalDate.of(anio, mes, dia)
+                        val vencimientoApto = fechaCarga.plusYears(1)
+                        val formatterOut = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                        val vigente = if (LocalDate.now().isBefore(vencimientoApto) || LocalDate.now().isEqual(vencimientoApto)) "Vigente" else "Vencido"
+                        textoVencimiento = "Apto Médico: $vigente, Vencimiento: ${vencimientoApto.format(formatterOut)}"
+                    }
+                } catch (e: Exception) { }
 
                 tvNombre.text = "$nombre $apellido"
                 tvDni.text = "DNI: $dniRecibido"
                 tvEmail.text = "Email: $email"
 
-                tvVencimientoApto.text = "Apto Médico Vence: $vencimientoApto"
+                tvVencimientoApto.text = textoVencimiento
             }
             cursor.close()
         }
