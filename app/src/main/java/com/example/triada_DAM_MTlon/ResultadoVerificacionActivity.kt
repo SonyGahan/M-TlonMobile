@@ -137,6 +137,7 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                 val intentRegistro = Intent(this, RegistroActivity::class.java)
                 intentRegistro.putExtra("DNI_NUEVO", dniRecibido)
                 startActivity(intentRegistro)
+                finish()
             }
         }
         cursor.close()
