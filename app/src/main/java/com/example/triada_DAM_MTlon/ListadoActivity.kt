@@ -42,11 +42,6 @@ class ListadoActivity : AppCompatActivity() {
                 textView.text = dato
                 textView.setTextColor(android.graphics.Color.WHITE)
                 textView.setPadding(12, 12, 12, 12)
-                
-                val params = GridLayout.LayoutParams()
-                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                textView.layoutParams = params
-                
                 gridLayout.addView(textView)
             }
         }
