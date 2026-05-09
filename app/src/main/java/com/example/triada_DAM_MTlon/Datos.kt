@@ -31,7 +31,6 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
         }
 
         cursor.close()
-        bd.close()
         return cantidad
     }
 
@@ -126,10 +125,10 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
 
         if (!existe) {
             val vencidos = listOf(
-                arrayOf("11111111", "Juan", "Perez", "juan@test.com", "12345", "10-01-2023", "Socio", "2024-03-15", "Vencida"),
-                arrayOf("22222222", "Maria", "Gomez", "maria@test.com", "12345", "12-02-2023", "Socio", "2024-04-10", "Vencida"),
-                arrayOf("33333333", "Carlos", "Lopez", "carlos@test.com", "12345", "05-03-2023", "Socio", "2024-02-20", "Vencida"),
-                arrayOf("44444444", "Ana", "Martinez", "ana@test.com", "12345", "20-04-2023", "Socio", "2024-01-05", "Vencida")
+                arrayOf("11111111", "Juan", "Perez", "juan@test.com", "12345", "10-01-2023", "Socio", "2023-03-15", "Vencida"),
+                arrayOf("22222222", "Maria", "Gomez", "maria@test.com", "12345", "12-02-2023", "Socio", "2023-04-10", "Vencida"),
+                arrayOf("33333333", "Carlos", "Lopez", "carlos@test.com", "12345", "05-03-2023", "Socio", "2023-02-20", "Vencida"),
+                arrayOf("44444444", "Ana", "Martinez", "ana@test.com", "12345", "20-04-2023", "Socio", "2023-01-05", "Vencida")
             )
             for (datos in vencidos) {
                 val cv = ContentValues()

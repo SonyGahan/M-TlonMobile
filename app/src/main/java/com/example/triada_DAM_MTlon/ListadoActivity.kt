@@ -21,16 +21,9 @@ class ListadoActivity : AppCompatActivity() {
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
 
         val base = Datos(this)
+        base.cargarMorososDePrueba()
         val fechaHoy = LocalDate.now().toString()
-        var resultadosConsulta: List<List<String>> = base.obtenerVencimientosComoLista(fechaHoy)
-        
-        if (resultadosConsulta.isEmpty()) {
-            resultadosConsulta = listOf(
-                listOf("11222333", "Pérez", "Juan", "01-05-2026"),
-                listOf("44555666", "Gómez", "María", "15-04-2026"),
-                listOf("77888999", "López", "Carlos", "28-02-2026")
-            )
-        }
+        val resultadosConsulta: List<List<String>> = base.obtenerVencimientosComoLista(fechaHoy)
         
         val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
 
