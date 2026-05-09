@@ -47,4 +47,9 @@ class VerificacionActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        findViewById<EditText>(R.id.etDniBuscar).text.clear()
+    }
 }

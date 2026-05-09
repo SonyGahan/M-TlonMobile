@@ -16,6 +16,9 @@ class MainActivity : AppCompatActivity() {
         val etUsuario = findViewById<EditText>(R.id.etUsuario)
         val etContrasenia = findViewById<EditText>(R.id.etContrasena)
 
+        val db = Datos(this)
+        db.cargarMorososDePrueba()
+
         btnIngresar.setOnClickListener {
             val usuario = etUsuario.text.toString()
             val contrasenia = etContrasenia.text.toString()

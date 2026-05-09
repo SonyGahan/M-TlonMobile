@@ -50,7 +50,7 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
         contenedor.put("estado_cuota", "Al día")
 
         val resultado = db.insert("socio", null, contenedor)
-        return if (resultado == -1L) "Falla en la carga de datos" else "Insert exitoso"
+        return if (resultado == -1L) "Falla en la carga de datos" else "Registro exitoso!"
     }
 
     fun obtenerSocio(dni: String): Cursor {
@@ -91,7 +91,6 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
     fun obtenerVencimientosComoLista(fechaHoy: String): List<List<String>> {
         val datos: MutableList<List<String>> = mutableListOf()
         val db = this.readableDatabase
-        // Incluimos order by para jerarquizar la información[cite: 5]
         val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio WHERE vencimiento <= ? ORDER BY vencimiento"
         val cursor = db.rawQuery(sql, arrayOf(fechaHoy))
 
@@ -116,6 +115,37 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
         val db = this.readableDatabase
         val query = "SELECT nombre, apellido, email, telefono, tipo_usuario, estado_apto, estado_cuota, vencimiento FROM socio WHERE dni = ?"
         return db.rawQuery(query, arrayOf(dni))
+    }
+
+    fun cargarMorososDePrueba() {
+        val db = this.writableDatabase
+        val query = "SELECT COUNT(*) FROM socio"
+        val cursor = db.rawQuery(query, null)
+        var count = 0
+        if (cursor.moveToFirst()) count = cursor.getInt(0)
+        cursor.close()
+
+        if (count < 4) {
+            val vencidos = listOf(
+                arrayOf("11111111", "Juan", "Perez", "juan@test.com", "12345", "10-01-2023", "Socio", "2024-03-15", "Vencida"),
+                arrayOf("22222222", "Maria", "Gomez", "maria@test.com", "12345", "12-02-2023", "Socio", "2024-04-10", "Vencida"),
+                arrayOf("33333333", "Carlos", "Lopez", "carlos@test.com", "12345", "05-03-2023", "Socio", "2024-02-20", "Vencida"),
+                arrayOf("44444444", "Ana", "Martinez", "ana@test.com", "12345", "20-04-2023", "Socio", "2024-01-05", "Vencida")
+            )
+            for (datos in vencidos) {
+                val cv = ContentValues()
+                cv.put("dni", datos[0].toInt())
+                cv.put("nombre", datos[1])
+                cv.put("apellido", datos[2])
+                cv.put("email", datos[3])
+                cv.put("telefono", datos[4])
+                cv.put("estado_apto", datos[5])
+                cv.put("tipo_usuario", datos[6])
+                cv.put("vencimiento", datos[7])
+                cv.put("estado_cuota", datos[8])
+                db.insert("socio", null, cv)
+            }
+        }
     }
 
     companion object {
