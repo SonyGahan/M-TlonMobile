@@ -13,13 +13,11 @@ class ComprobanteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comprobante)
 
-        // Recuperamos los datos del Intent
         val monto = intent.getStringExtra("MONTO") ?: "0"
         val dni = intent.getStringExtra("DNI") ?: ""
         val fecha = intent.getStringExtra("FECHA") ?: ""
         val metodo = intent.getStringExtra("METODO") ?: ""
 
-        // Referenciamos y asignamos
         findViewById<TextView>(R.id.tvMontoTicket).text = "$$monto"
         findViewById<TextView>(R.id.tvIdClienteTicket).text = "ID Cliente: $dni"
         findViewById<TextView>(R.id.tvFechaTicket).text = "Fecha: $fecha"
