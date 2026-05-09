@@ -69,16 +69,38 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                 val input = EditText(this)
                 input.inputType = InputType.TYPE_CLASS_DATETIME
                 input.hint = "DD-MM-AAAA"
+                input.addTextChangedListener(object : android.text.TextWatcher {
+                    private var isUpdating = false
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        if (isUpdating) return
+                        isUpdating = true
+                        var str = s.toString().replace(Regex("[^\\d]"), "")
+                        if (str.length > 8) str = str.substring(0, 8)
+                        val sb = StringBuilder()
+                        for (i in str.indices) {
+                            sb.append(str[i])
+                            if ((i == 1 || i == 3) && i != str.length - 1) sb.append("-")
+                        }
+                        input.setText(sb.toString())
+                        input.setSelection(input.text.length)
+                        isUpdating = false
+                    }
+                })
                 AlertDialog.Builder(this)
                     .setTitle("Renovar Apto Médico")
                     .setMessage("Ingrese la nueva fecha de carga (DD-MM-AAAA):")
                     .setView(input)
                     .setPositiveButton("Guardar") { _, _ ->
                         val nuevaFecha = input.text.toString().trim()
-                        if (nuevaFecha.isNotEmpty()) {
+                        val regexFecha = Regex("""^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$""")
+                        if (nuevaFecha.isNotEmpty() && regexFecha.matches(nuevaFecha)) {
                             db.actualizarApto(dniRecibido, nuevaFecha)
                             finish()
                             startActivity(intent)
+                        } else {
+                            android.widget.Toast.makeText(this, "Fecha inválida, debe ser DD-MM-AAAA", android.widget.Toast.LENGTH_LONG).show()
                         }
                     }
                     .setNegativeButton("Cancelar", null)

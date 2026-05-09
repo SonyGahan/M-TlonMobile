@@ -31,6 +31,28 @@ class RegistroActivity : AppCompatActivity() {
 
         etDniReg.setText(dniRecibido)
 
+        etApto.addTextChangedListener(object : android.text.TextWatcher {
+            private var isUpdating = false
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (isUpdating) return
+                isUpdating = true
+                var str = s.toString().replace(Regex("[^\\d]"), "")
+                if (str.length > 8) str = str.substring(0, 8)
+                val sb = StringBuilder()
+                for (i in str.indices) {
+                    sb.append(str[i])
+                    if ((i == 1 || i == 3) && i != str.length - 1) {
+                        sb.append("-")
+                    }
+                }
+                etApto.setText(sb.toString())
+                etApto.setSelection(etApto.text.length)
+                isUpdating = false
+            }
+        })
+
         btnRegistrarSocio.setOnClickListener {
             val dniTxt = etDniReg.text.toString().trim()
             val nombreTxt = etNombre.text.toString().trim()
@@ -42,6 +64,22 @@ class RegistroActivity : AppCompatActivity() {
             if (dniTxt.isEmpty() || nombreTxt.isEmpty() || apellidoTxt.isEmpty() ||
                 emailTxt.isEmpty() || telefonoTxt.isEmpty() || aptoTexto.isEmpty()) {
                 Toast.makeText(this, "ERROR: Todos los campos son obligatorios", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailTxt).matches()) {
+                Toast.makeText(this, "ERROR: Formato de email inválido", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (!android.util.Patterns.PHONE.matcher(telefonoTxt).matches()) {
+                Toast.makeText(this, "ERROR: Formato de teléfono inválido", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            val regexFecha = Regex("""^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$""")
+            if (!regexFecha.matches(aptoTexto)) {
+                Toast.makeText(this, "ERROR: La fecha debe ser DD-MM-AAAA", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
