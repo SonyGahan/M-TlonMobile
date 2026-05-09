@@ -23,7 +23,10 @@ class ListadoActivity : AppCompatActivity() {
         val base = Datos(this)
         base.cargarMorososDePrueba()
         val fechaHoy = LocalDate.now().toString()
-        val resultadosConsulta: List<List<String>> = base.obtenerVencimientosComoLista(fechaHoy)
+        val resultadosConsulta: MutableList<List<String>> = base.obtenerVencimientosComoLista(fechaHoy).toMutableList()
+        
+        // Fila de depuración para ver si el problema es el Grid o la DB
+        resultadosConsulta.add(0, listOf("000", "DEBUG", "TEST", "01-01-2000"))
         
         val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
 
