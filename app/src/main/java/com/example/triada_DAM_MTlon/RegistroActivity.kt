@@ -62,11 +62,12 @@ class RegistroActivity : AppCompatActivity() {
 
             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
 
-            if (mensaje == "Insert exitoso") {
+            if (mensaje == "Registro exitoso!") {
                 if (categoria == "Socio") {
                     val intentCobro = Intent(this, CobroActivity::class.java)
                     intentCobro.putExtra("DNI_SOCIO", etDniReg.text.toString())
                     startActivity(intentCobro)
+                    finish()
                 } else {
                     finish()
                 }
