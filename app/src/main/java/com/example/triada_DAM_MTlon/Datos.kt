@@ -119,13 +119,12 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
 
     fun cargarMorososDePrueba() {
         val db = this.writableDatabase
-        val query = "SELECT COUNT(*) FROM socio"
-        val cursor = db.rawQuery(query, null)
-        var count = 0
-        if (cursor.moveToFirst()) count = cursor.getInt(0)
+        val checkQuery = "SELECT dni FROM socio WHERE dni = 11111111"
+        val cursor = db.rawQuery(checkQuery, null)
+        val existe = cursor.moveToFirst()
         cursor.close()
 
-        if (count < 4) {
+        if (!existe) {
             val vencidos = listOf(
                 arrayOf("11111111", "Juan", "Perez", "juan@test.com", "12345", "10-01-2023", "Socio", "2024-03-15", "Vencida"),
                 arrayOf("22222222", "Maria", "Gomez", "maria@test.com", "12345", "12-02-2023", "Socio", "2024-04-10", "Vencida"),
