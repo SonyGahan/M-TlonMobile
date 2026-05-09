@@ -23,15 +23,7 @@ class ListadoActivity : AppCompatActivity() {
         val base = Datos(this)
         base.cargarMorososDePrueba()
         val fechaHoy = LocalDate.now().toString()
-        val resultadosConsulta = mutableListOf<List<String>>()
-        
-        // FORZAMOS UNA FILA HARDCODEADA PARA VER SI SE RENDERIZA
-        resultadosConsulta.add(listOf("123", "PRUEBA", "ALUMNO", "99-99-9999"))
-        
-        // Intentamos traer los de la DB
-        try {
-            resultadosConsulta.addAll(base.obtenerVencimientosComoLista(fechaHoy))
-        } catch (e: Exception) { }
+        val resultadosConsulta = base.obtenerVencimientosComoLista(fechaHoy)
         
         val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
 
@@ -49,8 +41,12 @@ class ListadoActivity : AppCompatActivity() {
                 val textView = TextView(this)
                 textView.text = dato
                 textView.setTextColor(android.graphics.Color.WHITE)
-                textView.setBackgroundColor(android.graphics.Color.parseColor("#333344"))
                 textView.setPadding(12, 12, 12, 12)
+                
+                val params = GridLayout.LayoutParams()
+                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                textView.layoutParams = params
+                
                 gridLayout.addView(textView)
             }
         }
