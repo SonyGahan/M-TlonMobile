@@ -46,7 +46,7 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
         contenedor.put("estado_apto", apto)
         contenedor.put("tipo_usuario", categoria)
         contenedor.put("vencimiento", vencimiento)
-        contenedor.put("estado_cuota", "Al día")
+        contenedor.put("estado_cuota", "Impaga")
 
         val resultado = db.insert("socio", null, contenedor)
         return if (resultado == -1L) "Falla en la carga de datos" else "Registro exitoso!"
