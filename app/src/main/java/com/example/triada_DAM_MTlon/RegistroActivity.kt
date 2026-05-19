@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import java.time.LocalDate
 import android.content.Intent
+import com.example.triada_DAM_MTlon.database.Datos
 
 class RegistroActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)

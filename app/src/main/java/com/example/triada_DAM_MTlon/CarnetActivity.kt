@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.triada_DAM_MTlon.database.Datos
 import java.time.LocalDate
 
 class CarnetActivity : AppCompatActivity() {
@@ -28,13 +29,13 @@ class CarnetActivity : AppCompatActivity() {
         val btnInicio = findViewById<Button>(R.id.btnInicioDeCarnet)
 
         if (dniRecibido.isNotEmpty()) {
-            val cursor = db.consultarEstadoDNI(dniRecibido)
-            if (cursor.moveToFirst()) {
-                val nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"))
-                val apellido = cursor.getString(cursor.getColumnIndexOrThrow("apellido"))
-                val email = cursor.getString(cursor.getColumnIndexOrThrow("email"))
+            val socio = db.consultarEstadoDNI(dniRecibido)
 
-                val fechaCargaAptoStr = cursor.getString(cursor.getColumnIndexOrThrow("estado_apto"))
+            if (socio != null) {
+                val nombre = socio.nombre
+                val apellido = socio.apellido
+                val email = socio.email
+                val fechaCargaAptoStr = socio.estadoApto
 
                 var textoVencimiento = "Apto Médico: $fechaCargaAptoStr"
                 try {
@@ -54,10 +55,8 @@ class CarnetActivity : AppCompatActivity() {
                 tvNombre.text = "$nombre $apellido"
                 tvDni.text = "DNI: $dniRecibido"
                 tvEmail.text = "Email: $email"
-
                 tvVencimientoApto.text = textoVencimiento
             }
-            cursor.close()
         }
 
         btnImprimir.setOnClickListener {

@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
+import com.example.triada_DAM_MTlon.database.Datos
 import java.time.LocalDate
 
 class ListadoActivity : AppCompatActivity() {

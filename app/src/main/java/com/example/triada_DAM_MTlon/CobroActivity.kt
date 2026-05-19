@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.triada_DAM_MTlon.database.Datos
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -17,7 +19,7 @@ class CobroActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cobro)
 
-        val dniRecibido = intent.getStringExtra("DNI_SOCIO") ?: ""
+        val dniRecibido = intent.getStringExtra("DNI") ?: ""
 
         val tvNombreCompleto = findViewById<TextView>(R.id.tvNombreCompleto)
         val tvDniCobro = findViewById<TextView>(R.id.tvDniCobro)
@@ -26,10 +28,8 @@ class CobroActivity : AppCompatActivity() {
         val etMonto = findViewById<EditText>(R.id.etMonto)
 
         val spModoPago = findViewById<Spinner>(R.id.spModoPago)
-        val opciones = arrayOf("Efectivo", "Transferencia")
-        val adapter = ArrayAdapter(this, R.layout.spinner_item, opciones)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spModoPago.adapter = adapter
+        val llContenedorCuotas = findViewById<LinearLayout>(R.id.llContenedorCuotas)
+        val spCuotas = findViewById<Spinner>(R.id.spCuotas)
 
         val btnRegistrarPago = findViewById<Button>(R.id.btnRegistrarPago)
         val btnNuevaConsulta = findViewById<Button>(R.id.btnNuevaConsultaCobro)
@@ -37,34 +37,67 @@ class CobroActivity : AppCompatActivity() {
 
         val db = Datos(this)
 
-        if (dniRecibido.isNotEmpty()) {
-            val cursor = db.obtenerSocio(dniRecibido)
-            if (cursor.moveToFirst()) {
-                val nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"))
-                val apellido = cursor.getString(cursor.getColumnIndexOrThrow("apellido"))
-                val email = cursor.getString(cursor.getColumnIndexOrThrow("email"))
-                val telefono = cursor.getString(cursor.getColumnIndexOrThrow("telefono"))
+        val listaCuotas = arrayOf("1 cuota", "3 cuotas", "6 cuotas", "12 cuotas")
+        val adapterCuotas = ArrayAdapter(this, R.layout.spinner_item, listaCuotas)
+        adapterCuotas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spCuotas.adapter = adapterCuotas
 
-                tvNombreCompleto.text = "$nombre $apellido"
+        var tipoUsuarioActual = "Socio"
+
+        if (dniRecibido.isNotEmpty()) {
+            val socio = db.consultarEstadoDNI(dniRecibido)
+            if (socio != null) {
+                tipoUsuarioActual = socio.tipoUsuario
+
+                tvNombreCompleto.text = "${socio.nombre} ${socio.apellido}"
                 tvDniCobro.text = "DNI: $dniRecibido"
-                tvEmailCobro.text = "Email: $email"
-                tvTelefonoCobro.text = "Teléfono: $telefono"
+                tvEmailCobro.text = "Email: ${socio.email}"
+                tvTelefonoCobro.text = "Teléfono: ${socio.telefono}"
             }
-            cursor.close()
+        }
+
+        val opcionesPago: Array<String> = if (tipoUsuarioActual.equals("No Socio", ignoreCase = true)) {
+            arrayOf("Efectivo", "Tarjeta de Débito")
+        } else {
+            arrayOf("Efectivo", "Tarjeta de Débito", "Tarjeta de Crédito", "Transferencia")
+        }
+
+        val adapterPago = ArrayAdapter(this, R.layout.spinner_item, opcionesPago)
+        adapterPago.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spModoPago.adapter = adapterPago
+
+        spModoPago.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val seleccion = opcionesPago[position]
+                if (seleccion == "Tarjeta de Crédito") {
+                    llContenedorCuotas.visibility = View.VISIBLE
+                } else {
+                    llContenedorCuotas.visibility = View.GONE
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
         btnRegistrarPago.setOnClickListener {
             val montoTxt = etMonto.text.toString().trim()
-            val modoPago = spModoPago.selectedItem.toString()
+            var modoPago = spModoPago.selectedItem.toString()
             val montoNum = montoTxt.toIntOrNull()
-            val dniNum = dniRecibido.toIntOrNull()
 
-            if (montoNum != null && dniNum != null) {
+            if (modoPago == "Tarjeta de Crédito") {
+                val cuotasSeleccionadas = spCuotas.selectedItem.toString()
+                modoPago = "Crédito ($cuotasSeleccionadas)"
+            }
+
+            if (montoNum != null && dniRecibido.isNotEmpty()) {
                 val fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss"))
-                val nuevoVencimiento = LocalDateTime.now().plusMonths(1).toLocalDate().toString()
-                db.actualizarVencimiento(dniNum, nuevoVencimiento)
 
-                val mensaje = db.insertarPago(dniNum, montoNum, modoPago, fechaHoraActual)
+                if (tipoUsuarioActual.equals("Socio", ignoreCase = true)) {
+                    val nuevoVencimiento = LocalDateTime.now().plusMonths(1).toLocalDate().toString()
+                    val dniInt = dniRecibido.toIntOrNull() ?: 0
+                    db.actualizarVencimiento(dniInt, nuevoVencimiento)
+                }
+
+                val mensaje = db.insertarPago(dniRecibido.toIntOrNull() ?: 0, montoNum, modoPago, fechaHoraActual)
                 Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
 
                 if (mensaje == "¡Pago exitoso!") {

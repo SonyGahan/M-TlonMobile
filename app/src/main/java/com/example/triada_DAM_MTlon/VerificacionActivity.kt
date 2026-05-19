@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.triada_DAM_MTlon.database.Datos
 
 class VerificacionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +18,7 @@ class VerificacionActivity : AppCompatActivity() {
 
         btnVerificar.setOnClickListener {
             val dniABuscar = etDniBuscar.text.toString().trim()
-            val flujoRecibido = intent.getStringExtra("FLUJO") ?: "REGISTRO"
+            val flujoRecibido = intent.getStringExtra("FLUXO") ?: intent.getStringExtra("FLUJO") ?: "REGISTRO"
             val db = Datos(this)
 
             if (dniABuscar.isNotEmpty()) {
@@ -26,13 +27,13 @@ class VerificacionActivity : AppCompatActivity() {
                 if (flujoRecibido == "PAGOS") {
                     if (existeSocio) {
                         val intentCobro = Intent(this, CobroActivity::class.java)
-                        intentCobro.putExtra("DNI_SOCIO", dniABuscar)
+                        intentCobro.putExtra("DNI", dniABuscar)
                         startActivity(intentCobro)
+                        finish()
                     } else {
                         Toast.makeText(this, "DNI no registrado como socio. Debe registrarlo primero.", Toast.LENGTH_LONG).show()
                     }
                 } else {
-
                     val intentResultado = Intent(this, ResultadoVerificacionActivity::class.java)
                     intentResultado.putExtra("DNI_BUSCADO", dniABuscar)
                     startActivity(intentResultado)

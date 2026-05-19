@@ -1,10 +1,11 @@
-package com.example.triada_DAM_MTlon
+package com.example.triada_DAM_MTlon.database
 
+import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.database.Cursor
-import android.content.ContentValues
+import com.example.triada_DAM_MTlon.model.SocioDTO
 
 class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 2) {
 
@@ -98,22 +99,40 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "MTlonDB.db", null, 
             fila.add(cursor.getString(cursor.getColumnIndexOrThrow("dni")))
             fila.add(cursor.getString(cursor.getColumnIndexOrThrow("apellido")))
             fila.add(cursor.getString(cursor.getColumnIndexOrThrow("nombre")))
-            
+
             val vencISO = cursor.getString(cursor.getColumnIndexOrThrow("vencimiento"))
             val partes = vencISO.split("-")
             val vencFormat = if(partes.size == 3) "${partes[2]}-${partes[1]}-${partes[0]}" else vencISO
             fila.add(vencFormat)
-            
+
             datos.add(fila)
         }
         cursor.close()
         return datos
     }
 
-    fun consultarEstadoDNI(dni: String): Cursor {
+    fun consultarEstadoDNI(dni: String): SocioDTO? {
         val db = this.readableDatabase
         val query = "SELECT nombre, apellido, email, telefono, tipo_usuario, estado_apto, estado_cuota, vencimiento FROM socio WHERE dni = ?"
-        return db.rawQuery(query, arrayOf(dni))
+        val cursor = db.rawQuery(query, arrayOf(dni))
+
+        var socio: SocioDTO? = null
+
+        if (cursor.moveToFirst()) {
+            socio = SocioDTO(
+                dni = dni,
+                nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre")),
+                apellido = cursor.getString(cursor.getColumnIndexOrThrow("apellido")),
+                email = cursor.getString(cursor.getColumnIndexOrThrow("email")),
+                telefono = cursor.getString(cursor.getColumnIndexOrThrow("telefono")),
+                tipoUsuario = cursor.getString(cursor.getColumnIndexOrThrow("tipo_usuario")),
+                estadoApto = cursor.getString(cursor.getColumnIndexOrThrow("estado_apto")),
+                estadoCuota = cursor.getString(cursor.getColumnIndexOrThrow("estado_cuota")),
+                vencimiento = cursor.getString(cursor.getColumnIndexOrThrow("vencimiento"))
+            )
+        }
+        cursor.close()
+        return socio
     }
 
     fun cargarMorososDePrueba() {
