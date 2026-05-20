@@ -1,16 +1,17 @@
 package com.example.triada_DAM_MTlon
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import java.time.LocalDate
-import android.content.Intent
 import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.model.SocioDTO
+import java.time.LocalDate
 
 class RegistroActivity : AppCompatActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +28,6 @@ class RegistroActivity : AppCompatActivity() {
         val rbNoSocio = findViewById<RadioButton>(R.id.rbNoSocio)
         val btnRegistrarSocio = findViewById<Button>(R.id.btnRegistrarSocio)
         val btnCancelar = findViewById<Button>(R.id.btnCancelar)
-
-        etDniReg.setText(dniRecibido)
 
         etDniReg.setText(dniRecibido)
 
@@ -59,11 +58,11 @@ class RegistroActivity : AppCompatActivity() {
             val nombreTxt = etNombre.text.toString().trim()
             val apellidoTxt = etApellido.text.toString().trim()
             val emailTxt = etEmail.text.toString().trim()
-            val telefonoTxt = etTelefono.text.toString().trim()
+            val telephoneTxt = etTelefono.text.toString().trim()
             val aptoTexto = etApto.text.toString().trim()
 
             if (dniTxt.isEmpty() || nombreTxt.isEmpty() || apellidoTxt.isEmpty() ||
-                emailTxt.isEmpty() || telefonoTxt.isEmpty() || aptoTexto.isEmpty()) {
+                emailTxt.isEmpty() || telephoneTxt.isEmpty() || aptoTexto.isEmpty()) {
                 Toast.makeText(this, "ERROR: Todos los campos son obligatorios", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -73,7 +72,7 @@ class RegistroActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (!android.util.Patterns.PHONE.matcher(telefonoTxt).matches()) {
+            if (!android.util.Patterns.PHONE.matcher(telephoneTxt).matches()) {
                 Toast.makeText(this, "ERROR: Formato de teléfono inválido", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -86,33 +85,51 @@ class RegistroActivity : AppCompatActivity() {
 
             val categoria = if (rbSocio.isChecked) "Socio" else "No Socio"
             val fechaHoy: LocalDate = LocalDate.now()
-            val vencimientoCuota = fechaHoy.plusMonths(1).toString()
+
+            val vencimientoCuota = if (categoria == "Socio") fechaHoy.plusMonths(1).toString() else fechaHoy.toString()
+            val estadoCuotaInicial = if (categoria == "Socio") "Impaga" else "No aplica"
+
             val db = Datos(this)
-            val mensaje = db.insertarSocio(
-                dniTxt.toInt(),
-                nombreTxt,
-                apellidoTxt,
-                emailTxt,
-                telefonoTxt,
-                aptoTexto,
-                categoria,
-                vencimientoCuota
+
+            val resultadoRowId = db.insertarSocio(
+                dni = dniTxt,
+                nombre = nombreTxt,
+                apellido = apellidoTxt,
+                email = emailTxt,
+                telefono = telephoneTxt,
+                apto = aptoTexto,
+                tipoUsuario = categoria,
+                vencimiento = vencimientoCuota,
+                estadoCuota = estadoCuotaInicial
             )
 
-            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+            if (resultadoRowId != -1L) {
+                Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show()
 
-            if (mensaje == "Registro exitoso!") {
-                if (categoria == "Socio") {
-                    val intentCobro = Intent(this, CobroActivity::class.java)
-                    intentCobro.putExtra("DNI_SOCIO", etDniReg.text.toString())
-                    startActivity(intentCobro)
-                    finish()
-                } else {
-                    finish()
-                }
+                val nuevoSocioDTO = SocioDTO(
+                    dni = dniTxt,
+                    nombre = nombreTxt,
+                    apellido = apellidoTxt,
+                    email = emailTxt,
+                    telefono = telephoneTxt,
+                    tipoUsuario = categoria,
+                    estadoApto = aptoTexto,
+                    estadoCuota = estadoCuotaInicial,
+                    vencimiento = vencimientoCuota
+                )
+
+                val intentCobro = Intent(this, CobroActivity::class.java)
+                intentCobro.putExtra("DNI", dniTxt) // Clave universal por si acaso
+                intentCobro.putExtra("SOCIO_OBJETO", nuevoSocioDTO)
+                startActivity(intentCobro)
+                finish()
+            } else {
+                Toast.makeText(this, "Error: Falla en la carga de datos en la base de datos", Toast.LENGTH_LONG).show()
             }
         }
 
-        btnCancelar.setOnClickListener { finish() }
+        btnCancelar.setOnClickListener {
+            finish()
+        }
     }
 }

@@ -13,7 +13,7 @@ class ComprobanteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comprobante)
 
-        val monto = intent.getStringExtra("MONTO") ?: "0"
+        val monto = intent.getStringExtra("MONTO") ?: "0.00"
         val dni = intent.getStringExtra("DNI") ?: ""
         val fecha = intent.getStringExtra("FECHA") ?: ""
         val metodo = intent.getStringExtra("METODO") ?: ""

@@ -8,9 +8,10 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.triada_DAM_MTlon.database.Datos
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.model.SocioDTO
 
 class CobroActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
@@ -20,6 +21,7 @@ class CobroActivity : AppCompatActivity() {
         setContentView(R.layout.activity_cobro)
 
         val dniRecibido = intent.getStringExtra("DNI") ?: ""
+        var tipoUsuarioActual = "Socio"
 
         val tvNombreCompleto = findViewById<TextView>(R.id.tvNombreCompleto)
         val tvDniCobro = findViewById<TextView>(R.id.tvDniCobro)
@@ -42,13 +44,23 @@ class CobroActivity : AppCompatActivity() {
         adapterCuotas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spCuotas.adapter = adapterCuotas
 
-        var tipoUsuarioActual = "Socio"
+        val socioObjeto = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("SOCIO_OBJETO", SocioDTO::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra("SOCIO_OBJETO") as? SocioDTO
+        }
 
-        if (dniRecibido.isNotEmpty()) {
+        if (socioObjeto != null) {
+            tipoUsuarioActual = socioObjeto.tipoUsuario
+            tvNombreCompleto.text = "${socioObjeto.nombre} ${socioObjeto.apellido}"
+            tvDniCobro.text = "DNI: ${socioObjeto.dni}"
+            tvEmailCobro.text = "Email: ${socioObjeto.email}"
+            tvTelefonoCobro.text = "Teléfono: ${socioObjeto.telefono}"
+        } else if (dniRecibido.isNotEmpty()) {
             val socio = db.consultarEstadoDNI(dniRecibido)
             if (socio != null) {
                 tipoUsuarioActual = socio.tipoUsuario
-
                 tvNombreCompleto.text = "${socio.nombre} ${socio.apellido}"
                 tvDniCobro.text = "DNI: $dniRecibido"
                 tvEmailCobro.text = "Email: ${socio.email}"
@@ -81,23 +93,22 @@ class CobroActivity : AppCompatActivity() {
         btnRegistrarPago.setOnClickListener {
             val montoTxt = etMonto.text.toString().trim()
             var modoPago = spModoPago.selectedItem.toString()
-            val montoNum = montoTxt.toIntOrNull()
-
-            if (modoPago == "Tarjeta de Crédito") {
-                val cuotasSeleccionadas = spCuotas.selectedItem.toString()
-                modoPago = "Crédito ($cuotasSeleccionadas)"
-            }
+            val montoNum = montoTxt.toDoubleOrNull()
 
             if (montoNum != null && dniRecibido.isNotEmpty()) {
                 val fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss"))
 
                 if (tipoUsuarioActual.equals("Socio", ignoreCase = true)) {
                     val nuevoVencimiento = LocalDateTime.now().plusMonths(1).toLocalDate().toString()
-                    val dniInt = dniRecibido.toIntOrNull() ?: 0
-                    db.actualizarVencimiento(dniInt, nuevoVencimiento)
+                    db.actualizarVencimiento(dniRecibido, nuevoVencimiento)
                 }
 
-                val mensaje = db.insertarPago(dniRecibido.toIntOrNull() ?: 0, montoNum, modoPago, fechaHoraActual)
+                if (modoPago == "Tarjeta de Crédito") {
+                    val cuotasSeleccionadas = spCuotas.selectedItem.toString()
+                    modoPago = "Crédito ($cuotasSeleccionadas)"
+                }
+
+                val mensaje = db.insertarPago(dniRecibido, montoNum, modoPago, fechaHoraActual)
                 Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
 
                 if (mensaje == "¡Pago exitoso!") {

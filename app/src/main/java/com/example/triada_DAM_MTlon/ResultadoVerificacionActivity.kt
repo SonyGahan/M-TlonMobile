@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.model.SocioDTO
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -49,7 +50,15 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             startActivity(intentMenu)
         }
 
-        val socio = db.consultarEstadoDNI(dniRecibido)
+        val btnCobrarCuota = findViewById<Button>(R.id.btnCobrarCuota)
+        btnCobrarCuota.setOnClickListener {
+            val intentCobro = Intent(this, CobroActivity::class.java)
+            intentCobro.putExtra("DNI", dniRecibido)
+            startActivity(intentCobro)
+            finish()
+        }
+
+        val socio: SocioDTO? = db.consultarEstadoDNI(dniRecibido)
 
         if (socio != null) {
             llRegistrado.visibility = View.VISIBLE
@@ -145,10 +154,20 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                 llTarjetaCuota.visibility = View.GONE
                 btnImprimirCarnet.visibility = View.GONE
             }
+
+            btnCobrarCuota.visibility = View.VISIBLE
+
+            if (tipoUsuarioSocio.equals("No Socio", ignoreCase = true)) {
+                btnCobrarCuota.text = "Cobrar Actividad"
+            } else {
+                btnCobrarCuota.text = "Registrar Pago de Cuota"
+            }
+
         } else {
             llNoRegistrado.visibility = View.VISIBLE
             llRegistrado.visibility = View.GONE
             btnImprimirCarnet.visibility = View.GONE
+            btnCobrarCuota.visibility = View.GONE
             findViewById<TextView>(R.id.tvDniBuscado).text = "DNI: $dniRecibido"
 
             val btnIrARegistro = findViewById<Button>(R.id.btnIrARegistro)

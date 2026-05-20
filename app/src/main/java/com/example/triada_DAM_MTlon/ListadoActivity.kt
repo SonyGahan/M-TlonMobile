@@ -23,11 +23,11 @@ class ListadoActivity : AppCompatActivity() {
 
         val base = Datos(this)
         base.cargarMorososDePrueba()
+
         val fechaHoy = LocalDate.now().toString()
         val resultadosConsulta = base.obtenerVencimientosComoLista(fechaHoy)
-        
-        val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
 
+        val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
         for (titulo in encabezados) {
             val tvHeader = TextView(this)
             tvHeader.text = titulo

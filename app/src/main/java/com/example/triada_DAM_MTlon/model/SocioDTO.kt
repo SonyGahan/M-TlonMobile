@@ -1,15 +1,14 @@
 package com.example.triada_DAM_MTlon.model
 
-import java.io.Serializable
-
+// Agregamos la implementación de Serializable para que pueda viajar entre actividades
 data class SocioDTO(
     val dni: String,
     val nombre: String,
     val apellido: String,
     val email: String,
     val telefono: String,
+    val tipoUsuario: String,
     val estadoApto: String,
-    val tipoUsuario: String, // Aquí se guardará "Socio" o "No Socio"
-    val vencimiento: String,
-    val estadoCuota: String
-) : Serializable
+    val estadoCuota: String,
+    val vencimiento: String
+) : java.io.Serializable
