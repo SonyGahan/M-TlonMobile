@@ -129,6 +129,7 @@ class CobroActivity : AppCompatActivity() {
         btnNuevaConsulta.setOnClickListener {
             val intentConsulta = Intent(this, VerificacionActivity::class.java)
             intentConsulta.putExtra("FLUJO", "PAGOS")
+            intentConsulta.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intentConsulta)
             finish()
         }

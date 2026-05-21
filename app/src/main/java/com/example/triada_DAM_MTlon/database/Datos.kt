@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.triada_DAM_MTlon.model.SocioDTO
 
-class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null, 1) {
+class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         val tablaSocio = """
@@ -20,7 +20,8 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null,
                 tipo_usuario TEXT,
                 text_apto TEXT,
                 estado_cuota TEXT,
-                vencimiento TEXT
+                vencimiento TEXT,
+                activo TEXT DEFAULT 'SI'
             )
         """.trimIndent()
         db?.execSQL(tablaSocio)
@@ -73,13 +74,14 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null,
             put("text_apto", apto)
             put("estado_cuota", estadoCuota)
             put("vencimiento", vencimiento)
+            put("activo", "SI")
         }
         return db.insert("socio", null, valores)
     }
 
     fun consultarEstadoDNI(dni: String): SocioDTO? {
         val db = this.readableDatabase
-        val query = "SELECT nombre, apellido, email, telefono, tipo_usuario, text_apto, estado_cuota, vencimiento FROM socio WHERE dni = ?"
+        val query = "SELECT nombre, apellido, email, telefono, tipo_usuario, text_apto, estado_cuota, vencimiento FROM socio WHERE dni = ? AND activo = 'SI'"
         val cursor = db.rawQuery(query, arrayOf(dni))
 
         var socio: SocioDTO? = null
@@ -165,4 +167,28 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null,
             insertarSocio("44444444", "Ana", "Martinez", "ana@test.com", "12345", "20-04-2023", "Socio", "2023-01-05", "Vencida")
         }
     }
+
+    fun modificarSocioCompleto(socio: SocioDTO): Boolean {
+        val db = this.writableDatabase
+        val valores = ContentValues().apply {
+            put("nombre", socio.nombre)
+            put("apellido", socio.apellido)
+            put("email", socio.email)
+            put("telefono", socio.telefono)
+            put("tipo_usuario", socio.tipoUsuario)
+            put("text_apto", socio.estadoApto)
+        }
+        val resultado = db.update("socio", valores, "dni = ?", arrayOf(socio.dni))
+        return resultado > 0
+    }
+
+    fun eliminarSocioLogico(dni: String): Boolean {
+        val db = this.writableDatabase
+        val valores = ContentValues().apply {
+            put("activo", "NO") // Cambia el estado del Cliente: dado de baja.
+        }
+        val resultado = db.update("socio", valores, "dni = ?", arrayOf(dni))
+        return resultado > 0
+    }
+
 }

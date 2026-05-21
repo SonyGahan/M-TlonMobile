@@ -18,6 +18,14 @@ class RegistroActivity : AppCompatActivity() {
         setContentView(R.layout.activity_registro)
 
         val dniRecibido = intent.getStringExtra("DNI_NUEVO") ?: ""
+
+        val socioEdicion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("SOCIO_EDICION", SocioDTO::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra("SOCIO_EDICION") as? SocioDTO
+        }
+
         val etDniReg = findViewById<EditText>(R.id.etDniReg)
         val etNombre = findViewById<EditText>(R.id.etNombre)
         val etApellido = findViewById<EditText>(R.id.etApellido)
@@ -29,7 +37,30 @@ class RegistroActivity : AppCompatActivity() {
         val btnRegistrarSocio = findViewById<Button>(R.id.btnRegistrarSocio)
         val btnCancelar = findViewById<Button>(R.id.btnCancelar)
 
-        etDniReg.setText(dniRecibido)
+        val db = Datos(this)
+
+        if (socioEdicion != null) {
+            etDniReg.setText(socioEdicion.dni)
+            etDniReg.isEnabled = false
+
+            etNombre.setText(socioEdicion.nombre)
+            etApellido.setText(socioEdicion.apellido)
+            etEmail.setText(socioEdicion.email)
+            etTelefono.setText(socioEdicion.telefono)
+            etApto.setText(socioEdicion.estadoApto)
+
+            if (socioEdicion.tipoUsuario.equals("Socio", ignoreCase = true)) {
+                rbSocio.isChecked = true
+            } else {
+                rbNoSocio.isChecked = true
+            }
+
+            btnRegistrarSocio.text = "Guardar Cambios"
+        } else {
+            etDniReg.setText(dniRecibido)
+            etDniReg.isEnabled = true
+            btnRegistrarSocio.text = "Registrar"
+        }
 
         etApto.addTextChangedListener(object : android.text.TextWatcher {
             private var isUpdating = false
@@ -84,29 +115,9 @@ class RegistroActivity : AppCompatActivity() {
             }
 
             val categoria = if (rbSocio.isChecked) "Socio" else "No Socio"
-            val fechaHoy: LocalDate = LocalDate.now()
 
-            val vencimientoCuota = if (categoria == "Socio") fechaHoy.plusMonths(1).toString() else fechaHoy.toString()
-            val estadoCuotaInicial = if (categoria == "Socio") "Impaga" else "No aplica"
-
-            val db = Datos(this)
-
-            val resultadoRowId = db.insertarSocio(
-                dni = dniTxt,
-                nombre = nombreTxt,
-                apellido = apellidoTxt,
-                email = emailTxt,
-                telefono = telephoneTxt,
-                apto = aptoTexto,
-                tipoUsuario = categoria,
-                vencimiento = vencimientoCuota,
-                estadoCuota = estadoCuotaInicial
-            )
-
-            if (resultadoRowId != -1L) {
-                Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show()
-
-                val nuevoSocioDTO = SocioDTO(
+            if (socioEdicion != null) {
+                val socioModificado = SocioDTO(
                     dni = dniTxt,
                     nombre = nombreTxt,
                     apellido = apellidoTxt,
@@ -114,22 +125,64 @@ class RegistroActivity : AppCompatActivity() {
                     telefono = telephoneTxt,
                     tipoUsuario = categoria,
                     estadoApto = aptoTexto,
-                    estadoCuota = estadoCuotaInicial,
-                    vencimiento = vencimientoCuota
+                    estadoCuota = socioEdicion.estadoCuota,
+                    vencimiento = socioEdicion.vencimiento
                 )
 
-                val intentCobro = Intent(this, CobroActivity::class.java)
-                intentCobro.putExtra("DNI", dniTxt) // Clave universal por si acaso
-                intentCobro.putExtra("SOCIO_OBJETO", nuevoSocioDTO)
-                startActivity(intentCobro)
-                finish()
+                val exito = db.modificarSocioCompleto(socioModificado)
+                if (exito) {
+                    Toast.makeText(this, "¡Datos modificados con éxito!", Toast.LENGTH_SHORT).show()
+
+                    val intentMenu = Intent(this, MenuActivity::class.java)
+                    intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intentMenu)
+                } else {
+                    Toast.makeText(this, "Error al actualizar los datos en la base de datos", Toast.LENGTH_SHORT).show()
+                }
+
             } else {
-                Toast.makeText(this, "Error: Falla en la carga de datos en la base de datos", Toast.LENGTH_LONG).show()
+                val CorporateHoy: LocalDate = LocalDate.now()
+                val vencimientoCuota = if (categoria == "Socio") CorporateHoy.plusMonths(1).toString() else CorporateHoy.toString()
+                val estadoCuotaInicial = if (categoria == "Socio") "Impaga" else "No aplica"
+
+                val resultadoRowId = db.insertarSocio(
+                    dni = dniTxt,
+                    nombre = nombreTxt,
+                    apellido = apellidoTxt,
+                    email = emailTxt,
+                    telefono = telephoneTxt,
+                    apto = aptoTexto,
+                    tipoUsuario = categoria,
+                    vencimiento = vencimientoCuota,
+                    estadoCuota = estadoCuotaInicial
+                )
+
+                if (resultadoRowId != -1L) {
+                    Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show()
+
+                    val nuevoSocioDTO = SocioDTO(
+                        dni = dniTxt,
+                        nombre = nombreTxt,
+                        apellido = apellidoTxt,
+                        email = emailTxt,
+                        telefono = telephoneTxt,
+                        tipoUsuario = categoria,
+                        estadoApto = aptoTexto,
+                        estadoCuota = estadoCuotaInicial,
+                        vencimiento = vencimientoCuota
+                    )
+
+                    val intentCobro = Intent(this, CobroActivity::class.java)
+                    intentCobro.putExtra("DNI", dniTxt)
+                    intentCobro.putExtra("SOCIO_OBJETO", nuevoSocioDTO)
+                    startActivity(intentCobro)
+                    finish()
+                } else {
+                    Toast.makeText(this, "Error: Falla en la carga de datos en la base de datos", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
-        btnCancelar.setOnClickListener {
-            finish()
-        }
+        btnCancelar.setOnClickListener { finish() }
     }
 }

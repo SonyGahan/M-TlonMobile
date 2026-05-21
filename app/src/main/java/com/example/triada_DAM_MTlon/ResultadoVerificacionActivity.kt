@@ -5,15 +5,11 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.triada_DAM_MTlon.database.Datos
-import com.example.triada_DAM_MTlon.model.SocioDTO
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -24,6 +20,8 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
     private lateinit var llNoRegistrado: LinearLayout
     private lateinit var llTarjetaCuota: LinearLayout
     private lateinit var btnImprimirCarnet: Button
+    private lateinit var btnEliminarSocio: Button
+    private lateinit var btnModificarSocio: Button
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,21 +32,14 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         llNoRegistrado = findViewById(R.id.llNoRegistrado)
         llTarjetaCuota = findViewById(R.id.llTarjetaCuota)
         btnImprimirCarnet = findViewById(R.id.btnImprimirCarnet)
+        btnEliminarSocio = findViewById(R.id.btnEliminarSocio)
+        btnModificarSocio = findViewById(R.id.btnModificarSocio)
 
         val dniRecibido = intent.getStringExtra("DNI_BUSCADO") ?: ""
         val db = Datos(this)
 
         val btnAtrasResult = findViewById<Button>(R.id.btnAtrasResult)
-        btnAtrasResult.setOnClickListener {
-            finish()
-        }
-
-        val btnVolverMenuResult = findViewById<Button>(R.id.btnVolverMenuResult)
-        btnVolverMenuResult.setOnClickListener {
-            val intentMenu = Intent(this, MenuActivity::class.java)
-            intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intentMenu)
-        }
+        btnAtrasResult.setOnClickListener { finish() }
 
         val btnCobrarCuota = findViewById<Button>(R.id.btnCobrarCuota)
         btnCobrarCuota.setOnClickListener {
@@ -58,11 +49,41 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             finish()
         }
 
-        val socio: SocioDTO? = db.consultarEstadoDNI(dniRecibido)
+        btnEliminarSocio.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Confirmar Baja")
+            builder.setMessage("¿Está seguro de que desea dar de baja a este cliente del sistema? Sus registros históricos no se perderán.")
+
+            builder.setPositiveButton("Sí, dar de baja") { dialog, _ ->
+                val exito = db.eliminarSocioLogico(dniRecibido)
+                if (exito) {
+                    Toast.makeText(this, "Cliente dado de baja correctamente", Toast.LENGTH_SHORT).show()
+                    val intentMenu = Intent(this, MenuActivity::class.java)
+                    intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intentMenu)
+                } else {
+                    Toast.makeText(this, "Error al procesar la baja", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+
+            builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+            builder.show()
+        }
+
+        val socio = db.consultarEstadoDNI(dniRecibido)
 
         if (socio != null) {
             llRegistrado.visibility = View.VISIBLE
             llNoRegistrado.visibility = View.GONE
+            btnEliminarSocio.visibility = View.VISIBLE
+            btnModificarSocio.visibility = View.VISIBLE
+            btnModificarSocio.setOnClickListener {
+                val intentEditar = Intent(this, RegistroActivity::class.java)
+                intentEditar.putExtra("SOCIO_EDICION", socio)
+                startActivity(intentEditar)
+                finish()
+            }
 
             val nombreSocio = socio.nombre
             val apellidoSocio = socio.apellido
@@ -125,15 +146,10 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                         } else {
                             Toast.makeText(this, "Error al actualizar en la base de datos", Toast.LENGTH_SHORT).show()
                         }
-                    } else {
-                        Toast.makeText(this, "La fecha no puede estar vacía", Toast.LENGTH_SHORT).show()
                     }
                     dialog.dismiss()
                 }
-
-                builder.setNegativeButton("Cancelar") { dialog, _ ->
-                    dialog.cancel()
-                }
+                builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.cancel() }
                 builder.show()
             }
 
@@ -156,7 +172,6 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             }
 
             btnCobrarCuota.visibility = View.VISIBLE
-
             if (tipoUsuarioSocio.equals("No Socio", ignoreCase = true)) {
                 btnCobrarCuota.text = "Cobrar Actividad"
             } else {
@@ -168,7 +183,9 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             llRegistrado.visibility = View.GONE
             btnImprimirCarnet.visibility = View.GONE
             btnCobrarCuota.visibility = View.GONE
+            btnEliminarSocio.visibility = View.GONE
             findViewById<TextView>(R.id.tvDniBuscado).text = "DNI: $dniRecibido"
+            btnModificarSocio.visibility = View.GONE
 
             val btnIrARegistro = findViewById<Button>(R.id.btnIrARegistro)
             btnIrARegistro.setOnClickListener {
