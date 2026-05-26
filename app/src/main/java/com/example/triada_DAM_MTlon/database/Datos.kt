@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.triada_DAM_MTlon.model.SocioDTO
 
-class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null, 2) {
+class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null, 3) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         val tablaSocio = """
@@ -136,7 +136,7 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null,
     fun obtenerVencimientosComoLista(fechaHoy: String): List<List<String>> {
         val datos: MutableList<List<String>> = mutableListOf()
         val db = this.readableDatabase
-        val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio WHERE vencimiento <= ? ORDER BY vencimiento"
+        val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio WHERE vencimiento <= ? AND activo = 'SI' ORDER BY vencimiento"
         val cursor = db.rawQuery(sql, arrayOf(fechaHoy))
         while (cursor.moveToNext()) {
             val fila: MutableList<String> = mutableListOf()
@@ -161,10 +161,10 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null,
         cursor.close()
 
         if (!existe) {
-            insertarSocio("11111111", "Juan", "Perez", "juan@test.com", "12345", "10-01-2023", "Socio", "2023-03-15", "Vencida")
-            insertarSocio("22222222", "Maria", "Gomez", "maria@test.com", "12345", "12-02-2023", "Socio", "2023-04-10", "Vencida")
-            insertarSocio("33333333", "Carlos", "Lopez", "carlos@test.com", "12345", "05-03-2023", "Socio", "2023-02-20", "Vencida")
-            insertarSocio("44444444", "Ana", "Martinez", "ana@test.com", "12345", "20-04-2023", "Socio", "2023-01-05", "Vencida")
+            insertarSocio("11111111", "Juan", "Perez", "juan@test.com", "12345", "10-01-2026", "Socio", "2026-03-15", "Vencida")
+            insertarSocio("22222222", "Maria", "Gomez", "maria@test.com", "12345", "12-02-2026", "Socio", "2026-04-10", "Vencida")
+            insertarSocio("33333333", "Carlos", "Lopez", "carlos@test.com", "12345", "05-03-2026", "Socio", "2026-02-20", "Vencida")
+            insertarSocio("44444444", "Ana", "Martinez", "ana@test.com", "12345", "20-04-2026", "Socio", "2026-01-05", "Vencida")
         }
     }
 
@@ -190,5 +190,4 @@ class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null,
         val resultado = db.update("socio", valores, "dni = ?", arrayOf(dni))
         return resultado > 0
     }
-
 }

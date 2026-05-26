@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.example.triada_DAM_MTlon.database.Datos
@@ -95,35 +96,54 @@ class CobroActivity : AppCompatActivity() {
             var modoPago = spModoPago.selectedItem.toString()
             val montoNum = montoTxt.toDoubleOrNull()
 
-            if (montoNum != null && dniRecibido.isNotEmpty()) {
-                val fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss"))
-
-                if (tipoUsuarioActual.equals("Socio", ignoreCase = true)) {
-                    val nuevoVencimiento = LocalDateTime.now().plusMonths(1).toLocalDate().toString()
-                    db.actualizarVencimiento(dniRecibido, nuevoVencimiento)
-                }
-
-                if (modoPago == "Tarjeta de Crédito") {
-                    val cuotasSeleccionadas = spCuotas.selectedItem.toString()
-                    modoPago = "Crédito ($cuotasSeleccionadas)"
-                }
-
-                val mensaje = db.insertarPago(dniRecibido, montoNum, modoPago, fechaHoraActual)
-                Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
-
-                if (mensaje == "¡Pago exitoso!") {
-                    val intentTicket = Intent(this, ComprobanteActivity::class.java)
-                    intentTicket.putExtra("MONTO", montoTxt)
-                    intentTicket.putExtra("DNI", dniRecibido)
-                    intentTicket.putExtra("FECHA", fechaHoraActual)
-                    intentTicket.putExtra("METODO", modoPago)
-                    startActivity(intentTicket)
-                    finish()
-                }
-
-            } else {
-                Toast.makeText(this, "Complete todos los campos del pago", Toast.LENGTH_SHORT).show()
+            if (montoTxt.isEmpty()) {
+                Toast.makeText(this, "ERROR: Debe ingresar un monto para registrar el pago", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            if (montoNum == null || montoNum <= 0.0) {
+                Toast.makeText(this, "ERROR: Ingrese un monto válido y mayor a cero ($0)", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            AlertDialog.Builder(this)
+                .setTitle("Confirmar Transacción")
+                .setMessage("¿Está seguro de registrar el pago de $$montoTxt mediante $modoPago?")
+                .setPositiveButton("Confirmar") { dialog, _ ->
+                    if (dniRecibido.isNotEmpty()) {
+                        val fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss"))
+
+                        if (tipoUsuarioActual.equals("Socio", ignoreCase = true)) {
+                            val nuevoVencimiento = LocalDateTime.now().plusMonths(1).toLocalDate().toString()
+                            db.actualizarVencimiento(dniRecibido, nuevoVencimiento)
+                        }
+
+                        if (modoPago == "Tarjeta de Crédito") {
+                            val cuotasSeleccionadas = spCuotas.selectedItem.toString()
+                            modoPago = "Crédito ($cuotasSeleccionadas)"
+                        }
+
+                        val mensaje = db.insertarPago(dniRecibido, montoNum, modoPago, fechaHoraActual)
+                        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+
+                        if (mensaje == "¡Pago exitoso!") {
+                            val intentTicket = Intent(this, ComprobanteActivity::class.java)
+                            intentTicket.putExtra("MONTO", montoTxt)
+                            intentTicket.putExtra("DNI", dniRecibido)
+                            intentTicket.putExtra("FECHA", fechaHoraActual)
+                            intentTicket.putExtra("METODO", modoPago)
+                            startActivity(intentTicket)
+                            finish()
+                        }
+                    } else {
+                        Toast.makeText(this, "Error crítico: DNI del cliente ausente", Toast.LENGTH_SHORT).show()
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancelar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
 
         btnNuevaConsulta.setOnClickListener {
@@ -136,6 +156,7 @@ class CobroActivity : AppCompatActivity() {
 
         btnVolverMenu.setOnClickListener {
             val intentInicio = Intent(this, MenuActivity::class.java)
+            intentInicio.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intentInicio)
             finish()
         }

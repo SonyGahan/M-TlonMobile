@@ -6,51 +6,40 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.triada_DAM_MTlon.database.Datos
 
 class VerificacionActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verificacion)
 
-        val etDniBuscar = findViewById<EditText>(R.id.etDniBuscar)
+        val etDniBusqueda = findViewById<EditText>(R.id.etDniBuscar)
         val btnVerificar = findViewById<Button>(R.id.btnVerificar)
+        val btnAtras = findViewById<Button>(R.id.btnVolverMenuVerificacion)
+
+        val flujoRecibido = intent.getStringExtra("FLUJO") ?: ""
 
         btnVerificar.setOnClickListener {
-            val dniABuscar = etDniBuscar.text.toString().trim()
-            val flujoRecibido = intent.getStringExtra("FLUXO") ?: intent.getStringExtra("FLUJO") ?: "REGISTRO"
-            val db = Datos(this)
+            val dniTxt = etDniBusqueda.text.toString().trim()
 
-            if (dniABuscar.isNotEmpty()) {
-                val existeSocio = db.buscaSocio(dniABuscar) > 0
-
-                if (flujoRecibido == "PAGOS") {
-                    if (existeSocio) {
-                        val intentCobro = Intent(this, CobroActivity::class.java)
-                        intentCobro.putExtra("DNI", dniABuscar)
-                        startActivity(intentCobro)
-                        finish()
-                    } else {
-                        Toast.makeText(this, "DNI no registrado como socio. Debe registrarlo primero.", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    val intentResultado = Intent(this, ResultadoVerificacionActivity::class.java)
-                    intentResultado.putExtra("DNI_BUSCADO", dniABuscar)
-                    startActivity(intentResultado)
-                }
-            } else {
-                Toast.makeText(this, "Por favor, ingrese un DNI", Toast.LENGTH_SHORT).show()
+            if (dniTxt.isEmpty()) {
+                Toast.makeText(this, "ERROR: El campo DNI no puede estar vacío", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            val regexDni = Regex("""^\d{7,8}$""")
+            if (!regexDni.matches(dniTxt)) {
+                Toast.makeText(this, "ERROR: Ingrese un DNI válido (debe tener entre 7 y 8 números, sin letras ni puntos)", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            val intentResultado = Intent(this, ResultadoVerificacionActivity::class.java)
+            intentResultado.putExtra("DNI_BUSCADO", dniTxt)
+            intentResultado.putExtra("FLUJO", flujoRecibido)
+            startActivity(intentResultado)
+            finish() //Mantiene limpia la pila de RAM.
         }
 
-        val btnVolverMenu = findViewById<Button>(R.id.btnVolverMenuVerificacion)
-        btnVolverMenu.setOnClickListener {
-            finish()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        findViewById<EditText>(R.id.etDniBuscar).text.clear()
+        btnAtras.setOnClickListener { finish() }
     }
 }

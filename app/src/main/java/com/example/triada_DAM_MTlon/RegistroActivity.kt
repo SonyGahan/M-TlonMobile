@@ -98,19 +98,31 @@ class RegistroActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailTxt).matches()) {
-                Toast.makeText(this, "ERROR: Formato de email inválido", Toast.LENGTH_LONG).show()
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailTxt).matches() || !emailTxt.contains(".")) {
+                Toast.makeText(this, "ERROR: Formato de correo electrónico inválido (ej: usuario@dominio.com)", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if (!android.util.Patterns.PHONE.matcher(telephoneTxt).matches()) {
-                Toast.makeText(this, "ERROR: Formato de teléfono inválido", Toast.LENGTH_LONG).show()
+            if (!android.util.Patterns.PHONE.matcher(telephoneTxt).matches() || telephoneTxt.length < 10) {
+                Toast.makeText(this, "ERROR: Formato de teléfono inválido (debe ingresar código de área + número, mínimo 10 dígitos)", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
             val regexFecha = Regex("""^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$""")
             if (!regexFecha.matches(aptoTexto)) {
-                Toast.makeText(this, "ERROR: La fecha debe ser DD-MM-AAAA", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "ERROR: La fecha del apto debe seguir el formato DD-MM-AAAA", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            try {
+                val partes = aptoTexto.split("-")
+                val fechaIngresada = LocalDate.of(partes[2].toInt(), partes[1].toInt(), partes[0].toInt())
+                if (fechaIngresada.isAfter(LocalDate.now())) {
+                    Toast.makeText(this, "ERROR: La fecha de emisión del apto médico no puede ser posterior al día de hoy", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "ERROR: La consistencia cronológica de la fecha es inválida", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -136,6 +148,7 @@ class RegistroActivity : AppCompatActivity() {
                     val intentMenu = Intent(this, MenuActivity::class.java)
                     intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intentMenu)
+                    finish()
                 } else {
                     Toast.makeText(this, "Error al actualizar los datos en la base de datos", Toast.LENGTH_SHORT).show()
                 }
@@ -144,6 +157,11 @@ class RegistroActivity : AppCompatActivity() {
                 val CorporateHoy: LocalDate = LocalDate.now()
                 val vencimientoCuota = if (categoria == "Socio") CorporateHoy.plusMonths(1).toString() else CorporateHoy.toString()
                 val estadoCuotaInicial = if (categoria == "Socio") "Impaga" else "No aplica"
+
+                if (db.buscaSocio(dniTxt) > 0) {
+                    Toast.makeText(this, "ERROR: El DNI $dniTxt ya se encuentra registrado en el sistema", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
 
                 val resultadoRowId = db.insertarSocio(
                     dni = dniTxt,

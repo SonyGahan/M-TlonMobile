@@ -1,10 +1,12 @@
 package com.example.triada_DAM_MTlon
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.triada_DAM_MTlon.database.Datos
@@ -32,6 +34,12 @@ class CarnetActivity : AppCompatActivity() {
             val socio = db.consultarEstadoDNI(dniRecibido)
 
             if (socio != null) {
+                if (socio.tipoUsuario.equals("No Socio", ignoreCase = true)) {
+                    Toast.makeText(this, "ERROR: Los clientes 'No Socio' no poseen carnet digital", Toast.LENGTH_LONG).show()
+                    finish() // Destruye la actividad para que no se renderice la interfaz.
+                    return
+                }
+
                 val nombre = socio.nombre
                 val apellido = socio.apellido
                 val email = socio.email
@@ -60,12 +68,12 @@ class CarnetActivity : AppCompatActivity() {
         }
 
         btnImprimir.setOnClickListener {
-            android.widget.Toast.makeText(this, "Imprimiendo carnet...", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Imprimiendo carnet...", Toast.LENGTH_SHORT).show()
         }
 
         btnInicio.setOnClickListener {
-            val intentMenu = android.content.Intent(this, MenuActivity::class.java)
-            intentMenu.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+            val intentMenu = Intent(this, MenuActivity::class.java)
+            intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intentMenu)
             finish()
         }
