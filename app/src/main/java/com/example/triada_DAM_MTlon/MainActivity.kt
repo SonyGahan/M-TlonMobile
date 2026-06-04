@@ -6,7 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.database.SQLiteHelper
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         val etUsuario = findViewById<EditText>(R.id.etUsuario)
         val etContrasenia = findViewById<EditText>(R.id.etContrasena)
 
-        val db = Datos(this)
+        val db = SQLiteHelper(this)
         db.cargarMorososDePrueba()
 
         btnIngresar.setOnClickListener {

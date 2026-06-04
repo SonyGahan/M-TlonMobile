@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
-import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.database.SQLiteHelper
 import java.time.LocalDate
 
 class ListadoActivity : AppCompatActivity() {
@@ -21,7 +21,7 @@ class ListadoActivity : AppCompatActivity() {
         val btnVolver = findViewById<Button>(R.id.btnVolverListado)
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
 
-        val base = Datos(this)
+        val base = SQLiteHelper(this)
         base.cargarMorososDePrueba()
 
         val fechaHoy = LocalDate.now().toString()

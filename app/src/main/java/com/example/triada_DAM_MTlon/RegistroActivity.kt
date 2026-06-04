@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.database.SQLiteHelper
 import com.example.triada_DAM_MTlon.model.SocioDTO
 import java.time.LocalDate
 
@@ -37,7 +37,7 @@ class RegistroActivity : AppCompatActivity() {
         val btnRegistrarSocio = findViewById<Button>(R.id.btnRegistrarSocio)
         val btnCancelar = findViewById<Button>(R.id.btnCancelar)
 
-        val db = Datos(this)
+        val db = SQLiteHelper(this)
 
         if (socioEdicion != null) {
             etDniReg.setText(socioEdicion.dni)
@@ -143,7 +143,7 @@ class RegistroActivity : AppCompatActivity() {
 
                 val exito = db.modificarSocioCompleto(socioModificado)
                 if (exito) {
-                    Toast.makeText(this, "¡Datos modificados con éxito!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "¡SQLiteHelper modificados con éxito!", Toast.LENGTH_SHORT).show()
 
                     val intentMenu = Intent(this, MenuActivity::class.java)
                     intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

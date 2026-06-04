@@ -9,7 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.database.SQLiteHelper
 import java.time.LocalDate
 
 class CarnetActivity : AppCompatActivity() {
@@ -20,7 +20,7 @@ class CarnetActivity : AppCompatActivity() {
         setContentView(R.layout.activity_carnet)
 
         val dniRecibido = intent.getStringExtra("DNI") ?: ""
-        val db = Datos(this)
+        val db = SQLiteHelper(this)
 
         val tvNombre = findViewById<TextView>(R.id.tvNombreCarnet)
         val tvDni = findViewById<TextView>(R.id.tvDniCarnet)

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.triada_DAM_MTlon.model.SocioDTO
 
-class Datos(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null, 3) {
+class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db", null, 3) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         val tablaSocio = """

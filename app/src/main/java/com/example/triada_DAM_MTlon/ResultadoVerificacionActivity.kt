@@ -9,7 +9,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.database.SQLiteHelper
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -36,7 +36,8 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         btnModificarSocio = findViewById(R.id.btnModificarSocio)
 
         val dniRecibido = intent.getStringExtra("DNI_BUSCADO") ?: ""
-        val db = Datos(this)
+
+        val db = SQLiteHelper(this)
 
         val btnAtrasResult = findViewById<Button>(R.id.btnAtrasResult)
         btnAtrasResult.setOnClickListener { finish() }
@@ -52,7 +53,7 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
         btnEliminarSocio.setOnClickListener {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Confirmar Baja")
-            builder.setMessage("¿Está seguro de que desea dar de baja a este cliente del sistema? Sus registros históricos no se perderán.")
+            builder.setMessage("¿Está seguro de que desea dar de baja a este cliente del sistema? Sus registros históricos de pago no se perderán.")
 
             builder.setPositiveButton("Sí, dar de baja") { dialog, _ ->
                 val exito = db.eliminarSocioLogico(dniRecibido)
@@ -61,6 +62,7 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                     val intentMenu = Intent(this, MenuActivity::class.java)
                     intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intentMenu)
+                    finish()
                 } else {
                     Toast.makeText(this, "Error al procesar la baja", Toast.LENGTH_SHORT).show()
                 }
@@ -139,6 +141,21 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                 builder.setPositiveButton("Guardar") { dialog, _ ->
                     val nuevaFecha = inputFecha.text.toString().trim()
                     if (nuevaFecha.isNotEmpty()) {
+
+                        try {
+                            val partes = nuevaFecha.split("-")
+                            val fechaSeleccionada = LocalDate.of(partes[2].toInt(), partes[1].toInt(), partes[0].toInt())
+                            if (fechaSeleccionada.isAfter(LocalDate.now())) {
+                                Toast.makeText(this, "ERROR: La fecha del nuevo apto médico no puede ser una fecha futura", Toast.LENGTH_LONG).show()
+                                dialog.dismiss()
+                                return@setPositiveButton
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "ERROR: Estructura de fecha inválida", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                            return@setPositiveButton
+                        }
+
                         val exito = db.actualizarApto(dniRecibido, nuevaFecha)
                         if (exito) {
                             Toast.makeText(this, "Apto Médico actualizado con éxito", Toast.LENGTH_SHORT).show()

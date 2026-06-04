@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import com.example.triada_DAM_MTlon.database.Datos
+import com.example.triada_DAM_MTlon.database.SQLiteHelper
 import com.example.triada_DAM_MTlon.model.SocioDTO
 
 class CobroActivity : AppCompatActivity() {
@@ -38,7 +38,7 @@ class CobroActivity : AppCompatActivity() {
         val btnNuevaConsulta = findViewById<Button>(R.id.btnNuevaConsultaCobro)
         val btnVolverMenu = findViewById<Button>(R.id.btnVolverMenu)
 
-        val db = Datos(this)
+        val db = SQLiteHelper(this)
 
         val listaCuotas = arrayOf("1 cuota", "3 cuotas", "6 cuotas", "12 cuotas")
         val adapterCuotas = ArrayAdapter(this, R.layout.spinner_item, listaCuotas)
@@ -132,6 +132,7 @@ class CobroActivity : AppCompatActivity() {
                             intentTicket.putExtra("DNI", dniRecibido)
                             intentTicket.putExtra("FECHA", fechaHoraActual)
                             intentTicket.putExtra("METODO", modoPago)
+                            intentTicket.putExtra("TIPO_USUARIO", tipoUsuarioActual)
                             startActivity(intentTicket)
                             finish()
                         }
