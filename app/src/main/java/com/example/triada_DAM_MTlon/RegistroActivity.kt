@@ -143,7 +143,7 @@ class RegistroActivity : AppCompatActivity() {
 
                 val exito = db.modificarSocioCompleto(socioModificado)
                 if (exito) {
-                    Toast.makeText(this, "¡SQLiteHelper modificados con éxito!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "¡Datos actualizados con éxito!", Toast.LENGTH_SHORT).show()
 
                     val intentMenu = Intent(this, MenuActivity::class.java)
                     intentMenu.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -154,8 +154,8 @@ class RegistroActivity : AppCompatActivity() {
                 }
 
             } else {
-                val CorporateHoy: LocalDate = LocalDate.now()
-                val vencimientoCuota = if (categoria == "Socio") CorporateHoy.plusMonths(1).toString() else CorporateHoy.toString()
+                val fechaHoy: LocalDate = LocalDate.now()
+                val vencimientoCuota = if (categoria == "Socio") fechaHoy.plusMonths(1).toString() else fechaHoy.toString()
                 val estadoCuotaInicial = if (categoria == "Socio") "Impaga" else "No aplica"
 
                 if (db.buscaSocio(dniTxt) > 0) {
@@ -196,7 +196,7 @@ class RegistroActivity : AppCompatActivity() {
                     startActivity(intentCobro)
                     finish()
                 } else {
-                    Toast.makeText(this, "Error: Falla en la carga de datos en la base de datos", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error: Falla la carga de datos en la base de datos", Toast.LENGTH_SHORT).show()
                 }
             }
         }

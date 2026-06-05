@@ -10,9 +10,11 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.triada_DAM_MTlon.database.SQLiteHelper
-import java.time.LocalDate
 
 class CarnetActivity : AppCompatActivity() {
+
+    private lateinit var db: SQLiteHelper
+
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +22,7 @@ class CarnetActivity : AppCompatActivity() {
         setContentView(R.layout.activity_carnet)
 
         val dniRecibido = intent.getStringExtra("DNI") ?: ""
-        val db = SQLiteHelper(this)
+        db = SQLiteHelper(this)
 
         val tvNombre = findViewById<TextView>(R.id.tvNombreCarnet)
         val tvDni = findViewById<TextView>(R.id.tvDniCarnet)
@@ -32,38 +34,19 @@ class CarnetActivity : AppCompatActivity() {
 
         if (dniRecibido.isNotEmpty()) {
             val socio = db.consultarEstadoDNI(dniRecibido)
-
             if (socio != null) {
                 if (socio.tipoUsuario.equals("No Socio", ignoreCase = true)) {
                     Toast.makeText(this, "ERROR: Los clientes 'No Socio' no poseen carnet digital", Toast.LENGTH_LONG).show()
-                    finish() // Destruye la actividad para que no se renderice la interfaz.
+                    finish()
                     return
                 }
 
-                val nombre = socio.nombre
-                val apellido = socio.apellido
-                val email = socio.email
-                val fechaCargaAptoStr = socio.estadoApto
-
-                var textoVencimiento = "Apto Médico: $fechaCargaAptoStr"
-                try {
-                    val partesApto = fechaCargaAptoStr.split("-", "/")
-                    if (partesApto.size == 3) {
-                        val anio = if (partesApto[2].length == 4) partesApto[2].toInt() else partesApto[0].toInt()
-                        val mes = partesApto[1].toInt()
-                        val dia = if (partesApto[2].length == 4) partesApto[0].toInt() else partesApto[2].toInt()
-                        val fechaCarga = LocalDate.of(anio, mes, dia)
-                        val vencimientoApto = fechaCarga.plusYears(1)
-                        val formatterOut = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                        val vigente = if (LocalDate.now().isBefore(vencimientoApto) || LocalDate.now().isEqual(vencimientoApto)) "Vigente" else "Vencido"
-                        textoVencimiento = "Apto Médico: $vigente, Vencimiento: ${vencimientoApto.format(formatterOut)}"
-                    }
-                } catch (e: Exception) { }
-
-                tvNombre.text = "$nombre $apellido"
+                tvNombre.text = "${socio.nombre} ${socio.apellido}"
                 tvDni.text = "DNI: $dniRecibido"
-                tvEmail.text = "Email: $email"
-                tvVencimientoApto.text = textoVencimiento
+                tvEmail.text = "Email: ${socio.email}"
+
+                // Invocación única al DTO.
+                tvVencimientoApto.text = socio.obtenerTextoAptoVencimiento()
             }
         }
 
@@ -78,8 +61,13 @@ class CarnetActivity : AppCompatActivity() {
             finish()
         }
 
-        btnVolver.setOnClickListener {
-            finish()
+        btnVolver.setOnClickListener { finish() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::db.isInitialized) {
+            db.close()
         }
     }
 }

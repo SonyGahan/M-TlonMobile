@@ -23,6 +23,8 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
     private lateinit var btnEliminarSocio: Button
     private lateinit var btnModificarSocio: Button
 
+    private lateinit var db: SQLiteHelper
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +39,7 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
 
         val dniRecibido = intent.getStringExtra("DNI_BUSCADO") ?: ""
 
-        val db = SQLiteHelper(this)
+        db = SQLiteHelper(this)
 
         val btnAtrasResult = findViewById<Button>(R.id.btnAtrasResult)
         btnAtrasResult.setOnClickListener { finish() }
@@ -90,29 +92,12 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
             val nombreSocio = socio.nombre
             val apellidoSocio = socio.apellido
             val tipoUsuarioSocio = socio.tipoUsuario
-            val estadoAptoSocio = socio.estadoApto
             val estadoCuotaSocio = socio.estadoCuota
             val vencimientoSocio = socio.vencimiento
 
             findViewById<TextView>(R.id.tvNombreResult).text = "$nombreSocio $apellidoSocio"
             findViewById<TextView>(R.id.tvTipoSocioBadge).text = tipoUsuarioSocio
-
-            var textoApto = "Apto Físico: $estadoAptoSocio"
-            try {
-                val partesApto = estadoAptoSocio.split("-", "/")
-                if (partesApto.size == 3) {
-                    val anio = if (partesApto[2].length == 4) partesApto[2].toInt() else partesApto[0].toInt()
-                    val mes = partesApto[1].toInt()
-                    val dia = if (partesApto[2].length == 4) partesApto[0].toInt() else partesApto[2].toInt()
-                    val fechaCarga = LocalDate.of(anio, mes, dia)
-                    val vencimientoApto = fechaCarga.plusYears(1)
-                    val vigente = if (LocalDate.now().isBefore(vencimientoApto) || LocalDate.now().isEqual(vencimientoApto)) "Vigente" else "Vencido"
-                    val formatterOut = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                    textoApto = "Apto Médico: $vigente, Vencimiento: ${vencimientoApto.format(formatterOut)}"
-                }
-            } catch (e: Exception) { }
-
-            findViewById<TextView>(R.id.tvAptoResult).text = textoApto
+            findViewById<TextView>(R.id.tvAptoResult).text = socio.obtenerTextoAptoVencimiento()
 
             val btnRenovarApto = findViewById<Button>(R.id.btnRenovarApto)
             btnRenovarApto.setOnClickListener {
@@ -176,7 +161,18 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
 
                 val partesVenc = vencimientoSocio.split("-")
                 val vencFormat = if (partesVenc.size == 3) "${partesVenc[2]}-${partesVenc[1]}-${partesVenc[0]}" else vencimientoSocio
-                findViewById<TextView>(R.id.tvEstadoCuota).text = "Estado de Cuota: $estadoCuotaSocio, Vence: $vencFormat"
+
+                var estadoCuotaCalculado = estadoCuotaSocio
+                try {
+                    val fechaVencimiento = LocalDate.parse(vencimientoSocio)
+                    if (LocalDate.now().isAfter(fechaVencimiento)) {
+                        estadoCuotaCalculado = "Vencida"
+                    }
+                } catch (e: Exception) {
+                    estadoCuotaCalculado = estadoCuotaSocio
+                }
+
+                findViewById<TextView>(R.id.tvEstadoCuota).text = "Estado de Cuota: $estadoCuotaCalculado, Vence: $vencFormat"
 
                 btnImprimirCarnet.setOnClickListener {
                     val intentCarnet = Intent(this, CarnetActivity::class.java)
@@ -211,6 +207,13 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                 startActivity(intentRegistro)
                 finish()
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::db.isInitialized) {
+            db.close()
         }
     }
 }
