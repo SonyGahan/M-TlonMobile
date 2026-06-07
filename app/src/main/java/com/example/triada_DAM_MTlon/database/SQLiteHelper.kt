@@ -47,7 +47,7 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
 
     fun buscaSocio(dni: String): Int {
         val bd = this.readableDatabase
-        val query = "SELECT COUNT(*) FROM socio WHERE dni = ?"
+        val query = "SELECT COUNT(*) FROM socio WHERE dni = ? AND activo = 'SI'"
         val selectionArgs = arrayOf(dni)
         val cursor: Cursor = bd.rawQuery(query, selectionArgs)
         var cantidad = 0
@@ -64,8 +64,17 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
         vencimiento: String, estadoCuota: String
     ): Long {
         val db = this.writableDatabase
+
+        // Chequea si el registro ya existe de forma física en la base de datos.
+        val queryCheck = "SELECT COUNT(*) FROM socio WHERE dni = ?"
+        val cursor = db.rawQuery(queryCheck, arrayOf(dni))
+        var existeFisicamente = false
+        if (cursor.moveToFirst()) {
+            existeFisicamente = cursor.getInt(0) > 0
+        }
+        cursor.close()
+
         val valores = ContentValues().apply {
-            put("dni", dni)
             put("nombre", nombre)
             put("apellido", apellido)
             put("email", email)
@@ -74,9 +83,18 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
             put("text_apto", apto)
             put("estado_cuota", estadoCuota)
             put("vencimiento", vencimiento)
-            put("activo", "SI")
+            put("activo", "SI") // ¡Acá se activa de nuevo el cliente!
         }
-        return db.insert("socio", null, valores)
+
+        return if (existeFisicamente) {
+            // UPDATE para reactivar el cliente.
+            val filasAfectadas = db.update("socio", valores, "dni = ?", arrayOf(dni))
+            if (filasAfectadas > 0) 1L else -1L // Devolvemos 1L para simular un ID de inserción exitoso
+        } else {
+            // Registro de alta nueva.
+            valores.put("dni", dni)
+            db.insert("socio", null, valores)
+        }
     }
 
     fun consultarEstadoDNI(dni: String): SocioDTO? {
@@ -120,7 +138,7 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
         val contenedor = ContentValues().apply {
             put("text_apto", nuevaFecha)
         }
-        val resultado = db.update("socio", contenedor, "dni = ?", arrayOf(dni))
+        val resultado = db.update("socio", contenedor, "dni = ? AND activo = 'SI'", arrayOf(dni))
         return resultado > 0
     }
 
@@ -130,7 +148,7 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
             put("vencimiento", nuevaFecha)
             put("estado_cuota", "Al día")
         }
-        db.update("socio", contenedor, "dni = ?", arrayOf(dni))
+        db.update("socio", contenedor, "dni = ? AND activo = 'SI'", arrayOf(dni))
     }
 
     fun obtenerVencimientosComoLista(fechaHoy: String): List<List<String>> {
@@ -177,6 +195,10 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
             put("telefono", socio.telefono)
             put("tipo_usuario", socio.tipoUsuario)
             put("text_apto", socio.estadoApto)
+
+            if (socio.tipoUsuario == "Socio") {
+                put("estado_cuota", "Impaga")
+            }
         }
         val resultado = db.update("socio", valores, "dni = ?", arrayOf(socio.dni))
         return resultado > 0
