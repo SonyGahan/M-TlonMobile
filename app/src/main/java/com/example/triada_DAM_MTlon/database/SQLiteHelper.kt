@@ -154,7 +154,7 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
     fun obtenerVencimientosComoLista(fechaHoy: String): List<List<String>> {
         val datos: MutableList<List<String>> = mutableListOf()
         val db = this.readableDatabase
-        val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio WHERE vencimiento <= ? AND activo = 'SI' ORDER BY vencimiento"
+        val sql = "SELECT dni, apellido, nombre, vencimiento FROM socio WHERE vencimiento <= ? AND activo = 'SI' AND tipo_usuario = 'Socio' ORDER BY vencimiento"
         val cursor = db.rawQuery(sql, arrayOf(fechaHoy))
         while (cursor.moveToNext()) {
             val fila: MutableList<String> = mutableListOf()
