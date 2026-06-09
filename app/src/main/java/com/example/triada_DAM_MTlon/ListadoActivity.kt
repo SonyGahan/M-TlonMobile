@@ -6,6 +6,7 @@ import android.os.Build
 import android.widget.Button
 import android.widget.GridLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
@@ -26,6 +27,11 @@ class ListadoActivity : AppCompatActivity() {
 
         val fechaHoy = LocalDate.now().toString()
         val resultadosConsulta = base.obtenerVencimientosComoLista(fechaHoy)
+
+        if (resultadosConsulta.isEmpty()) {
+            Toast.makeText(this, "No hay deudores registrados a la fecha", Toast.LENGTH_LONG).show()
+            finish() // Vuelve al menu cuando no hay deudores.
+        }
 
         val encabezados = arrayOf("DNI", "Apellido", "Nombre", "Vence")
         for (titulo in encabezados) {
