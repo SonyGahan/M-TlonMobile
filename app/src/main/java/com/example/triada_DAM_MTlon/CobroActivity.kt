@@ -70,9 +70,9 @@ class CobroActivity : AppCompatActivity() {
         }
 
         val opcionesPago: Array<String> = if (tipoUsuarioActual.equals("No Socio", ignoreCase = true)) {
-            arrayOf("Efectivo", "Tarjeta de Débito")
+            arrayOf("Efectivo", "Transferencia", "Tarjeta de Débito")
         } else {
-            arrayOf("Efectivo", "Tarjeta de Débito", "Tarjeta de Crédito", "Transferencia")
+            arrayOf("Efectivo", "Transferencia", "Tarjeta de Crédito", "Tarjeta de Débito")
         }
 
         val adapterPago = ArrayAdapter(this, R.layout.spinner_item, opcionesPago)

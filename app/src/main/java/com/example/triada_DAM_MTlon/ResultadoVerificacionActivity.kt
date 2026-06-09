@@ -108,6 +108,30 @@ class ResultadoVerificacionActivity : AppCompatActivity() {
                 val inputFecha = EditText(this)
                 inputFecha.hint = "DD-MM-AAAA"
                 inputFecha.setPadding(50, 20, 50, 20)
+                inputFecha.inputType = android.text.InputType.TYPE_CLASS_DATETIME
+
+                inputFecha.addTextChangedListener(object : android.text.TextWatcher {
+                    private var isUpdating = false
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        if (isUpdating) return
+                        isUpdating = true
+                        var str = s.toString().replace(Regex("[^\\d]"), "")
+                        if (str.length > 8) str = str.substring(0, 8)
+                        val sb = StringBuilder()
+                        for (i in str.indices) {
+                            sb.append(str[i])
+                            if ((i == 1 || i == 3) && i != str.length - 1) {
+                                sb.append("-")
+                            }
+                        }
+                        inputFecha.setText(sb.toString())
+                        inputFecha.setSelection(inputFecha.text.length)
+                        isUpdating = false
+                    }
+                })
+
                 builder.setView(inputFecha)
 
                 inputFecha.setOnClickListener {
