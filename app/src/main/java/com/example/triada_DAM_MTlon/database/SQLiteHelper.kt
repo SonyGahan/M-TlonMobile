@@ -83,13 +83,13 @@ class SQLiteHelper(contexto: Context) : SQLiteOpenHelper(contexto, "gimnasio.db"
             put("text_apto", apto)
             put("estado_cuota", estadoCuota)
             put("vencimiento", vencimiento)
-            put("activo", "SI") // ¡Acá se activa de nuevo el cliente!
+            put("activo", "SI")
         }
 
         return if (existeFisicamente) {
             // UPDATE para reactivar el cliente.
             val filasAfectadas = db.update("socio", valores, "dni = ?", arrayOf(dni))
-            if (filasAfectadas > 0) 1L else -1L // Devolvemos 1L para simular un ID de inserción exitoso
+            if (filasAfectadas > 0) 1L else -1L
         } else {
             // Registro de alta nueva.
             valores.put("dni", dni)
